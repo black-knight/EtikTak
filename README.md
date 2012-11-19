@@ -1,4 +1,4 @@
-EtikTak
-=======
+Etik-Tak!
+=========
 
-EtikTak
+Etik-Tak! ... Dyr'bar viden når du handler.
