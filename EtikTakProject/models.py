@@ -1,5 +1,4 @@
 from django.db import models
-from field import CoordinatesField
 
 #from django_extensions.db.fields.encrypted import EncryptedCharField
 
@@ -17,5 +16,6 @@ class SuperMarket(models.Model):
 
 class SuperMarketLocation(models.Model):
     supermarket = models.ForeignKey(SuperMarket)
-    location = CoordinatesField()
+    location = models.CharField(max_length=255)
+
 
