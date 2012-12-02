@@ -15,7 +15,7 @@ class PhoneNumber(models.Model):
 class SuperMarket(models.Model):
     name = models.CharField(max_length=255)
 
-class SpecificSuperMarket(models.Model):
+class SuperMarketLocation(models.Model):
     address = map_fields.AddressField(max_length=200)
     geolocation = map_fields.GeoLocationField(max_length=100)
     supermarket = models.ForeignKey(SuperMarket)
