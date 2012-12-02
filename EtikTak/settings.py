@@ -102,9 +102,6 @@ ROOT_URLCONF = 'EtikTak.urls'
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'EtikTak.wsgi.application'
 
-MAP_API='google'
-MAP_API_KEY='AIzaSyByFZJomT67Zug0EPEiVXKWGJp-EGymNlQ'
-
 TEMPLATE_DIRS = ('/Users/daniel/projects/EtikTak/templates',)
 
 INSTALLED_APPS = (
@@ -115,6 +112,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
+    'django_google_maps',
     # Uncomment the next line to enable the admin:
     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:

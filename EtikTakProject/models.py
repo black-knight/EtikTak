@@ -1,4 +1,5 @@
 from django.db import models
+from django_google_maps import fields as map_fields
 
 #from django_extensions.db.fields.encrypted import EncryptedCharField
 
@@ -14,8 +15,7 @@ class PhoneNumber(models.Model):
 class SuperMarket(models.Model):
     name = models.CharField(max_length=255)
 
-class SuperMarketLocation(models.Model):
+class SpecificSuperMarket(models.Model):
+    address = map_fields.AddressField(max_length=200)
+    geolocation = map_fields.GeoLocationField(max_length=100)
     supermarket = models.ForeignKey(SuperMarket)
-    location = models.CharField(max_length=255)
-
-
