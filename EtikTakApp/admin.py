@@ -1,4 +1,4 @@
-from EtikTakApp.models import UserCredentials, PhoneNumber, SuperMarket, SuperMarketLocation
+from EtikTakApp.models.supermarket import SuperMarket, SuperMarketLocation
 from django.contrib import admin
 from django_google_maps import widgets as map_widgets
 from django_google_maps import fields as map_fields
