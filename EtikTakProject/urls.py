@@ -6,8 +6,8 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     # Examples:
-    # url(r'^$', 'EtikTak.views.home', name='home'),
-    # url(r'^EtikTak/', include('EtikTak.foo.urls')),
+    # url(r'^$', 'EtikTakProject.views.home', name='home'),
+    # url(r'^EtikTakProject/', include('EtikTakProject.foo.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
