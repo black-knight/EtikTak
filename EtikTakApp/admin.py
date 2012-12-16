@@ -1,13 +1,16 @@
-from EtikTakApp.models.supermarket import SuperMarket, SuperMarketLocation
+from EtikTakApp.models.supermarket import Supermarket, SupermarketLocation
+from EtikTakApp.models.users import User
+
 from django.contrib import admin
 from django_google_maps import widgets as map_widgets
 from django_google_maps import fields as map_fields
 
-class SuperMarketLocationAdmin(admin.ModelAdmin):
+class SupermarketLocationAdmin(admin.ModelAdmin):
     formfield_overrides = {
             map_fields.AddressField: {'widget': map_widgets.GoogleMapsAddressWidget},
     }
 
-admin.site.register(SuperMarket)
-admin.site.register(SuperMarketLocation, SuperMarketLocationAdmin)
+admin.site.register(Supermarket)
+admin.site.register(SupermarketLocation, SupermarketLocationAdmin)
+admin.site.register(User)
 
