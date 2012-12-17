@@ -17,3 +17,6 @@ cp -rf * ~/webapps/etiktak/
 
 cd ~/download
 rm -rf master EtikTak-master
+
+~/webapps/etiktak/apache2/bin/restart
+
