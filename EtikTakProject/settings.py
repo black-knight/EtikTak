@@ -112,7 +112,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    #'django_extensions',
+    'django_extensions',
     'django_google_maps',
     'piston',
     # Uncomment the next line to enable the admin:
