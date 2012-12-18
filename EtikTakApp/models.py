@@ -23,6 +23,8 @@ class ProductCategory(models.Model):
     category = models.CharField(max_length=255)
 
 class Product(models.Model):
+    product_name = models.CharField(max_length=255)
+    product_ean = models.CharField(max_length=100)
     product_category = models.ForeignKey(ProductCategory)
 
 class ProductLocation(models.Model):

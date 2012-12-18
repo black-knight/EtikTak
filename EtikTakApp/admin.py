@@ -12,4 +12,6 @@ class SupermarketLocationAdmin(admin.ModelAdmin):
 admin.site.register(Supermarket)
 admin.site.register(SupermarketLocation, SupermarketLocationAdmin)
 admin.site.register(User)
+admin.site.register(ProductCategory)
+admin.site.register(Product)
 
