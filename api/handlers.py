@@ -1,6 +1,6 @@
 from piston.handler import BaseHandler
 from piston.emitters import *
-from EtikTakApp.models.supermarket import *
+from EtikTakApp.models import *
 
 class SupermarketHandler(BaseHandler):
     allowed_methods = ('GET',)
