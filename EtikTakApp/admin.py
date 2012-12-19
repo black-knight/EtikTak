@@ -1,4 +1,6 @@
-from EtikTakApp.models import *
+from EtikTakApp.models.supermarkets import *
+from EtikTakApp.models.users import *
+from EtikTakApp.models.products import *
 
 from django.contrib import admin
 from django_google_maps import widgets as map_widgets

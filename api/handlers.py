@@ -4,7 +4,7 @@ from EtikTakApp.models import *
 
 class SupermarketHandler(BaseHandler):
     allowed_methods = ('GET',)
-    model = Supermarket
+    model = supermarkets.Supermarket
     Emitter.register('json', JSONEmitter, 'application/json; charset=utf-8')
 
     def read(self, request, supermarket_id=None):
@@ -17,7 +17,7 @@ class SupermarketHandler(BaseHandler):
 
 class SupermarketLocationHandler(BaseHandler):
     allowed_methods = ('GET',)
-    model = SupermarketLocation
+    model = supermarkets.SupermarketLocation
     Emitter.register('json', JSONEmitter, 'application/json; charset=utf-8')
 
     def read(self, request, supermarket_location_id=None):
