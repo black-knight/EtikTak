@@ -18,5 +18,8 @@ cp -rf * ~/webapps/etiktak/
 cd ~/download
 rm -rf master EtikTak-master
 
+cd ~/webapps/etiktak
+python2.7 ./manage.py syncdb
+
 ~/webapps/etiktak/apache2/bin/restart
 
