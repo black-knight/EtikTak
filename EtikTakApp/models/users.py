@@ -25,11 +25,11 @@ class UserCredentials(models.Model):
         verbose_name_plural = u"Bruger kodeord"
         app_label = "EtikTakApp"
 
-class PhoneNumber(models.Model):
-    phoneNumberHash = models.CharField(max_length=255) # EncryptedCharField(max_length=255)
+class MobileNumber(models.Model):
+    mobileNumberHash = models.CharField(max_length=255) # EncryptedCharField(max_length=255)
 
     def __unicode__(self):
-        return u"%s" % (self.phoneNumberHash)
+        return u"%s" % (self.mobileNumberHash)
 
     class Meta:
         verbose_name = u"Mobilnummer"

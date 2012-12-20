@@ -16,11 +16,11 @@ class Client(models.Model):
 
 class ClientKey(models.Model):
     uid = models.CharField(max_length=255) # EncryptedCharField(max_length=255)
-    phoneNumberHashPasswordHashHashed = models.CharField(max_length=255) # EncryptedCharField(max_length=255)
+    mobileNumberHashPasswordHashHashed = models.CharField(max_length=255) # EncryptedCharField(max_length=255)
     challengeHash = models.CharField(max_length=255) # EncryptedCharField(max_length=255)
 
     def __unicode__(self):
-        return u"%s | %s | %s" % (self.uid, self.phoneNumberHashPasswordHashHashed, self.challengeHash)
+        return u"%s | %s | %s" % (self.uid, self.mobileNumberHashPasswordHashHashed, self.challengeHash)
 
     class Meta:
         verbose_name = u"Klientnøgle"
