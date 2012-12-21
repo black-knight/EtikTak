@@ -1,6 +1,7 @@
-from EtikTakApp.util.util import *
+from EtikTakApp.util import util
+
 from django.db import models
 
 class MobileNumberManager(models.Manager):
-    def exists(self, mobileNumber):
-        return self.filter(mobileNumberHash = sha256(mobileNumber)).exists()
+    def exists(self, mobile_number):
+        return self.filter(mobile_number_hash = util.sha256(mobile_number)).exists()
