@@ -8,7 +8,7 @@ class ProductCategory(models.Model):
     category = models.CharField(max_length=255)
 
     def __unicode__(self):
-        return u"%s" % (self.category)
+        return u"%s" % self.category
 
     class Meta:
         verbose_name = u"Produktkategori"
@@ -35,7 +35,7 @@ class ProductLocation(models.Model):
     client = models.ForeignKey(clients.ClientKey)
 
     def __unicode__(self):
-        return u"%s" % (self.supermarket_location)
+        return u"%s" % self.supermarket_location
 
     class Meta:
         verbose_name = u"Produktlokation"

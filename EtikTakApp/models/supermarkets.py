@@ -7,7 +7,7 @@ class Supermarket(models.Model):
     name = models.CharField(max_length=255)
 
     def __unicode__(self):
-        return u"%s" % (self.name)
+        return u"%s" % self.name
 
     class Meta:
         verbose_name = u"Supermarked"

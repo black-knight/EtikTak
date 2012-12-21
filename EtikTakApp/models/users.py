@@ -1,6 +1,7 @@
 # encoding: utf-8
 
 from django.db import models
+from EtikTakApp.managers.usermanager import *
 
 class User(models.Model):
     username = models.CharField(max_length=255)
@@ -18,7 +19,7 @@ class UserCredentials(models.Model):
     credentialsHash = models.CharField(max_length=255)
 
     def __unicode__(self):
-        return u"%s" % (self.credentialsHash)
+        return u"%s" % self.credentialsHash
 
     class Meta:
         verbose_name = u"Bruger kodeord"
@@ -28,8 +29,10 @@ class UserCredentials(models.Model):
 class MobileNumber(models.Model):
     mobileNumberHash = models.CharField(max_length=255) # EncryptedCharField(max_length=255)
 
+    objects = MobileNumberManager()
+
     def __unicode__(self):
-        return u"%s" % (self.mobileNumberHash)
+        return u"%s" % self.mobileNumberHash
 
     class Meta:
         verbose_name = u"Mobilnummer"
