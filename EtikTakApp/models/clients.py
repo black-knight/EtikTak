@@ -14,7 +14,7 @@ class Client(models.Model):
         return client
 
     def __unicode__(self):
-        return u"%s" % (self.uid)
+        return u"%s" % self.uid
 
     class Meta:
         verbose_name = u"Klient"
