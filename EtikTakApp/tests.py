@@ -23,11 +23,42 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from django.test import TestCase
+# tests.py
+import sys, EtikTakProject.settings, re, os, doctest, unittest, imp
 
-class SimpleTest(TestCase):
-    def test_basic_addition(self):
-        """
-        Tests that 1 + 1 always equals 2.
-        """
-        self.assertEqual(1 + 1, 2)
+# import your base Django project
+import EtikTakApp
+
+# Django already runs these, don't include them again
+ALREADY_RUN = ['tests.py', 'models.py', '__init__.py']
+
+def find_untested_modules(package):
+    dirindex = len(os.getcwd()) + len("/")
+    """ Gets all modules not already included in Django's test suite """
+    files = [re.sub('\.py$', '', os.path.join(root, f)[dirindex:])
+             for root, dirnames, filenames in os.walk(os.path.dirname(package.__file__))
+             for f in filenames if f.endswith(".py") and os.path.basename(f) not in ALREADY_RUN]
+    return [imp.load_module(file, *imp.find_module(os.path.basename(file), [file[:len(file) - len(os.path.basename(file)) - 1]]))
+            for file in files]
+
+def modules_callables(module):
+    return [m for m in dir(module) if callable(getattr(module, m))]
+
+def has_doctest(docstring):
+    return ">>>" in docstring
+
+__test__ = {}
+for module in find_untested_modules(EtikTakApp):
+    print "Module: %s" % module.__name__
+    for method in modules_callables(module):
+        docstring = str(getattr(module, method).__doc__)
+        if has_doctest(docstring):
+
+            print "Found doctest(s) " + module.__name__ + "." + method
+
+            # import the method itself, so doctest can find it
+            _temp = __import__(module.__name__, globals(), locals(), [method])
+            locals()[method] = getattr(_temp, method)
+
+            # Django looks in __test__ for doctests to run
+            __test__[method] = getattr(module, method)
