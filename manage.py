@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # encoding: utf-8
 
 # Copyright (c) 2012, Daniel Andersen (dani_ande@yahoo.dk)
@@ -25,7 +27,6 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#!/usr/bin/env python
 import os
 import sys
 
