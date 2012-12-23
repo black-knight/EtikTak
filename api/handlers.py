@@ -23,7 +23,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from EtikTakApp.models import *
+from etiktak.supermarkets import models as supermarkets
 
 from piston.handler import BaseHandler
 from piston.emitters import *
@@ -34,7 +34,7 @@ class SupermarketHandler(BaseHandler):
     Emitter.register('json', JSONEmitter, 'application/json; charset=utf-8')
 
     def read(self, request, supermarket_id=None):
-        base = Supermarket.objects
+        base = supermarkets.Supermarket.objects
 
         if supermarket_id:
             return base.get(pk=supermarket_id)
@@ -47,7 +47,7 @@ class SupermarketLocationHandler(BaseHandler):
     Emitter.register('json', JSONEmitter, 'application/json; charset=utf-8')
 
     def read(self, request, supermarket_location_id=None):
-        base = SupermarketLocation.objects
+        base = supermarkets.SupermarketLocation.objects
 
         if supermarket_location_id:
             return base.get(pk=supermarket_location_id)

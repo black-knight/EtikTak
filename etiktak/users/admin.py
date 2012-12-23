@@ -23,7 +23,8 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from EtikTakApp.models.supermarkets import *
-from EtikTakApp.models.users import *
-from EtikTakApp.models.clients import *
-from EtikTakApp.models.products import *
+from etiktak.users.models import *
+
+from django.contrib import admin
+
+admin.site.register(User)

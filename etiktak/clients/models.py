@@ -27,8 +27,8 @@
 
 import uuid
 
-from EtikTakApp.util import util
-from EtikTakApp.models.users import MobileNumber
+from etiktak.util import util
+from etiktak.users.models import MobileNumber
 
 from django.db import models
 from datetime import datetime
@@ -51,7 +51,6 @@ class Client(models.Model):
     class Meta:
         verbose_name = u"Klient"
         verbose_name_plural = u"Klienter"
-        app_label = "EtikTakApp"
 
 class ClientKey(models.Model):
     uid = models.CharField(max_length=255) # EncryptedCharField(max_length=255)
@@ -81,5 +80,4 @@ class ClientKey(models.Model):
     class Meta:
         verbose_name = u"Klientnøgle"
         verbose_name_plural = u"Klientnøgler"
-        app_label = "EtikTakApp"
 

@@ -142,7 +142,11 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
-    'EtikTakApp',
+    'etiktak.util',
+    'etiktak.clients',
+    'etiktak.users',
+    'etiktak.supermarkets',
+    'etiktak.products',
 )
 
 # A sample logging configuration. The only tangible logging

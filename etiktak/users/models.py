@@ -25,11 +25,14 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from EtikTakApp.util import util
-from EtikTakApp.managers.usermanager import *
+from etiktak.util import util
 
 from datetime import datetime
 from django.db import models
+
+class MobileNumberManager(models.Manager):
+    def exists(self, mobile_number):
+        return self.filter(mobile_number_hash = util.sha256(mobile_number)).exists()
 
 class User(models.Model):
     username = models.CharField(max_length=255)
@@ -51,7 +54,6 @@ class User(models.Model):
     class Meta:
         verbose_name = u"Bruger"
         verbose_name_plural = u"Brugere"
-        app_label = "EtikTakApp"
 
 class UserCredentials(models.Model):
     credentials_hash = models.CharField(max_length=255)
@@ -72,7 +74,6 @@ class UserCredentials(models.Model):
     class Meta:
         verbose_name = u"Bruger kodeord"
         verbose_name_plural = u"Bruger kodeord"
-        app_label = "EtikTakApp"
 
 class MobileNumber(models.Model):
     mobile_number_hash = models.CharField(max_length=255) # EncryptedCharField(max_length=255)
@@ -95,5 +96,3 @@ class MobileNumber(models.Model):
     class Meta:
         verbose_name = u"Mobilnummer"
         verbose_name_plural = u"Mobilnumre"
-        app_label = "EtikTakApp"
-

@@ -25,8 +25,8 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from EtikTakApp.models import supermarkets
-from EtikTakApp.models import clients
+from etiktak.supermarkets import models as supermarkets
+from etiktak.clients import models as clients
 
 from datetime import datetime
 from django.db import models
@@ -51,7 +51,6 @@ class ProductCategory(models.Model):
     class Meta:
         verbose_name = u"Produktkategori"
         verbose_name_plural = u"Produktkategorier"
-        app_label = "EtikTakApp"
 
 class Product(models.Model):
     name = models.CharField(max_length=255)
@@ -75,7 +74,6 @@ class Product(models.Model):
     class Meta:
         verbose_name = u"Produkt"
         verbose_name_plural = u"Produkter"
-        app_label = "EtikTakApp"
 
 class ProductLocation(models.Model):
     product = models.ForeignKey(Product)
@@ -99,5 +97,3 @@ class ProductLocation(models.Model):
     class Meta:
         verbose_name = u"Produktlokation"
         verbose_name_plural = u"Produktlokationer"
-        app_label = "EtikTakApp"
-

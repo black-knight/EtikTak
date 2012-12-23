@@ -49,7 +49,6 @@ class Supermarket(models.Model):
     class Meta:
         verbose_name = u"Supermarked"
         verbose_name_plural = u"Supermarkeder"
-        app_label = "EtikTakApp"
 
 class SupermarketLocation(models.Model):
     address = map_fields.AddressField(max_length=200)
@@ -73,5 +72,4 @@ class SupermarketLocation(models.Model):
     class Meta:
         verbose_name = u"Supermarkedslokation"
         verbose_name_plural = u"Supermarkedslokationer"
-        app_label = "EtikTakApp"
 
