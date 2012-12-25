@@ -23,18 +23,3 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from django.conf.urls import *
-from piston.resource import Resource
-from api.handlers import *
-
-create_user_handler = Resource(CreateUserHandler)
-supermarket_handler = Resource(SupermarketHandler)
-supermarket_location_handler = Resource(SupermarketLocationHandler)
-
-urlpatterns = patterns('',
-    url(r'^users/apply(?P<mobile_number>[^/]+)/', create_user_handler, { 'emitter_format' : 'json' }),
-    url(r'^supermarket/(?P<supermarket_id>[^/]+)/', supermarket_handler, { 'emitter_format': 'json' }),
-    url(r'^supermarkets$', supermarket_handler, { 'emitter_format': 'json' }),
-    url(r'^supermarket_location/(?P<supermarket_location_id>[^/]+)/', supermarket_location_handler, { 'emitter_format': 'json' }), 
-    url(r'^supermarket_locations$', supermarket_location_handler, { 'emitter_format': 'json' }),
-)

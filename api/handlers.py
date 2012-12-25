@@ -24,9 +24,18 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from etiktak.supermarkets import models as supermarkets
+from etiktak.users import models as users
 
 from piston.handler import BaseHandler
 from piston.emitters import *
+
+class CreateUserHandler(BaseHandler):
+    allowed_methods = ('GET',)
+    Emitter.register('json', JSONEmitter, 'application/json; charset=utf-8')
+
+    def read(self, request, mobile_number=None):
+
+        base = supermarkets.Supermarket.objects
 
 class SupermarketHandler(BaseHandler):
     allowed_methods = ('GET',)

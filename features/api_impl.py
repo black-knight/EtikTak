@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 # Copyright (c) 2012, Daniel Andersen (dani_ande@yahoo.dk)
 # All rights reserved.
 #
@@ -23,18 +25,28 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from django.conf.urls import *
-from piston.resource import Resource
-from api.handlers import *
+from lettuce.django import django_url
+from lettuce import world
+from django.test.client import Client
 
-create_user_handler = Resource(CreateUserHandler)
-supermarket_handler = Resource(SupermarketHandler)
-supermarket_location_handler = Resource(SupermarketLocationHandler)
+APPLY_URL = "users/apply"
 
-urlpatterns = patterns('',
-    url(r'^users/apply(?P<mobile_number>[^/]+)/', create_user_handler, { 'emitter_format' : 'json' }),
-    url(r'^supermarket/(?P<supermarket_id>[^/]+)/', supermarket_handler, { 'emitter_format': 'json' }),
-    url(r'^supermarkets$', supermarket_handler, { 'emitter_format': 'json' }),
-    url(r'^supermarket_location/(?P<supermarket_location_id>[^/]+)/', supermarket_location_handler, { 'emitter_format': 'json' }), 
-    url(r'^supermarket_locations$', supermarket_location_handler, { 'emitter_format': 'json' }),
-)
+def parse_url(url, params = None):
+    if params is None:
+        return url
+    first = True
+    for (key, value) in params:
+        url += "?" if first else "&"
+        url += key + "=" + value
+        first = False
+    return url
+
+def call(url, params = None):
+    url = parse_url(url, params)
+    print url
+    print
+    world.client = Client()
+    world.response = world.client.get(django_url("/api/%s" % url))
+
+def apply_for_user(mobile_number, password):
+    call(APPLY_URL, [("mobile_number", mobile_number), ("password", password)])

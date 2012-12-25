@@ -138,9 +138,8 @@ INSTALLED_APPS = (
     'django_extensions',
     'django_google_maps',
     'piston',
-    # Uncomment the next line to enable the admin:
+    'lettuce.django',
     'django.contrib.admin',
-    # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     'etiktak.util',
     'etiktak.clients',
