@@ -34,6 +34,10 @@ class CreateUserHandler(BaseHandler):
     Emitter.register('json', JSONEmitter, 'application/json; charset=utf-8')
 
     def read(self, request, mobile_number=None):
-        mobile_number = util.getRequiredParam(request, 'mobile_number')
-        password = util.getRequiredParam(request, 'password')
-        user_service.apply_for_user(mobile_number, password)
+        try:
+            mobile_number = util.getRequiredParam(request, 'mobile_number')
+            password = util.getRequiredParam(request, 'password')
+            user_service.apply_for_user(mobile_number, password)
+            return {"result": "OK"}
+        except Exception as e:
+            return {"result": e}

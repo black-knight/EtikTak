@@ -25,28 +25,8 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from lettuce.django import django_url
-from lettuce import world
-from django.test.client import Client
+from etiktak.clients import models as clients
 
-APPLY_URL = "users/apply"
-
-def parse_url(url, params = None):
-    if params is None:
-        return url
-    first = True
-    for (key, value) in params:
-        url += "?" if first else "&"
-        url += key + "=" + value
-        first = False
-    return url
-
-def call(url, params = None):
-    url = parse_url(url, params)
-    print url
-    print
-    world.client = Client()
-    world.response = world.client.get(django_url("/api/%s" % url))
-
-def apply_for_user(mobile_number, password):
-    call(APPLY_URL, [("mobile_number", mobile_number), ("password", password)])
+def generate_challenge(mobile_number):
+    sms_verification = clients.SmsVerification.create_challenge(mobile_number)
+    print sms_verification

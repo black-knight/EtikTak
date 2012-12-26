@@ -35,8 +35,8 @@ class MobileNumberManager(models.Manager):
         return self.filter(mobile_number_hash = util.sha256(mobile_number)).exists()
 
 class User(models.Model):
-    username = models.CharField(max_length=255)
-    email = models.EmailField(max_length=255)
+    username = models.CharField(max_length=255, unique=True)
+    email = models.EmailField(max_length=255, unique=True)
     created_timestamp = models.DateTimeField()
 
     @staticmethod
@@ -76,7 +76,7 @@ class UserCredentials(models.Model):
         verbose_name_plural = u"Bruger kodeord"
 
 class MobileNumber(models.Model):
-    mobile_number_hash = models.CharField(max_length=255) # EncryptedCharField(max_length=255)
+    mobile_number_hash = models.CharField(max_length=255, unique=True) # EncryptedCharField(max_length=255)
     created_timestamp = models.DateTimeField()
 
     objects = MobileNumberManager()
@@ -86,6 +86,8 @@ class MobileNumber(models.Model):
         """
         Creates and saves the hash of the specified mobile number.
         """
+        if MobileNumber.objects.exists(mobile_number):
+            raise ValueError("Mobile number %s already exists" % mobile_number)
         m = MobileNumber(mobile_number_hash = util.sha256(mobile_number), created_timestamp = datetime.now())
         m.save()
         return m

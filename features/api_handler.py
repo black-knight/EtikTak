@@ -25,38 +25,31 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from lettuce import step
+import simplejson as json
+from lettuce.django import django_url
 from lettuce import world
-import api_handler
+from django.test.client import Client
 
-@step(u'Given I apply for a new user with mobile number "([^"]*)" and password "([^"]*)"')
-def given_i_apply_for_a_new_user_with_mobile_number_group1_and_password_group2(step, group1, group2):
-    world.mobile_number = group1
-    world.password = group2
-    api_handler.apply_for_user(world.mobile_number, world.password)
+APPLY_URL = "users/apply"
 
-@step(u'And I simulate an SMS with pincode "([^"]*)"')
-def and_i_simulate_an_sms_with_pincode_group1(step, group1):
-    world.sms_verification = group1
-    assert False, 'This step must be implemented'
+def parse_url(url, params = None):
+    if params is None:
+        return url
+    first = True
+    for (key, value) in params:
+        url += "?" if first else "&"
+        url += key + "=" + value
+        first = False
+    return url
 
-@step(u'Then I can register the user')
-def then_i_can_register_the_user(step):
-    assert False, 'This step must be implemented'
+def call(url, params = None):
+    url = parse_url(url, params)
+    world.client = Client()
+    world.response = world.client.get(django_url("/api/%s" % url), follow=True)
 
-@step(u'And I can login')
-def and_i_can_login(step):
-    assert False, 'This step must be implemented'
-
-@step(u'Given there is already a user with mobile number "([^"]*)"')
-def given_there_is_already_a_user_with_mobile_number_group1(step, group1):
-    world.mobile_number = group1
-    api_handler.apply_for_user(world.mobile_number, "test1234")
-
-@step(u'Then I cannot apply for a new user with that mobile number')
-def then_i_cannot_apply_for_a_new_user_with_that_mobile_number(step):
-    try:
-        api_handler.apply_for_user(world.mobile_number, "not_test1234")
-    except BaseException:
-        return
-    raise BaseException("I was able to apply from mobile phone number already used: %s" % world.mobile_number)
+def apply_for_user(mobile_number, password):
+    call(APPLY_URL, [("mobile_number", mobile_number), ("password", password)])
+    result = json.loads(world.response.content)
+    if result.get("result") != "OK":
+        raise BaseException("Could not apply for user: %s" % result)
+    return result

@@ -24,6 +24,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import hashlib
+import uuid
 
 def sha256(s):
     return hashlib.sha256(s).hexdigest()
@@ -33,3 +34,6 @@ def getRequiredParam(request, param):
     if value is None:
         raise ValueError("Missing parameter '%s'" % param)
     return value
+
+def generate_challenge():
+    return uuid.uuid4()

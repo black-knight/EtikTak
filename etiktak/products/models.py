@@ -32,7 +32,7 @@ from datetime import datetime
 from django.db import models
 
 class ProductCategory(models.Model):
-    category = models.CharField(max_length=255)
+    category = models.CharField(max_length=255, unique=True)
     created_timestamp = models.DateTimeField()
 
     @staticmethod
@@ -54,7 +54,7 @@ class ProductCategory(models.Model):
 
 class Product(models.Model):
     name = models.CharField(max_length=255)
-    ean = models.CharField(max_length=100)
+    ean = models.CharField(max_length=100, unique=True)
     category = models.ForeignKey(ProductCategory)
     created_timestamp = models.DateTimeField()
 

@@ -7,5 +7,5 @@ Scenario: I can create a user
     And I can login
 
 Scenario: I cannot create a user with an existing mobile number
-    Given there is already a user with mobile number "12345678"
+    Given there is already a user with mobile number "87654321"
     Then I cannot apply for a new user with that mobile number
