@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 # Copyright (c) 2012, Daniel Andersen (dani_ande@yahoo.dk)
 # All rights reserved.
 #
@@ -22,18 +24,3 @@
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-from etiktak.service import user_service
-from etiktak.util import util
-
-from piston.handler import BaseHandler
-from piston.emitters import *
-
-class CreateUserHandler(BaseHandler):
-    allowed_methods = ('GET',)
-    Emitter.register('json', JSONEmitter, 'application/json; charset=utf-8')
-
-    def read(self, request, mobile_number=None):
-        mobile_number = util.getRequiredParam(request, 'mobile_number')
-        password = util.getRequiredParam(request, 'password')
-        user_service.apply_for_user(mobile_number, password)

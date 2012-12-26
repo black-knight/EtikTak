@@ -27,3 +27,9 @@ import hashlib
 
 def sha256(s):
     return hashlib.sha256(s).hexdigest()
+
+def getRequiredParam(request, param):
+    value = request.GET.get(param)
+    if value is None:
+        raise ValueError("Missing parameter '%s'" % param)
+    return value

@@ -31,3 +31,4 @@ from etiktak.users import models as users
 def apply_for_user(mobile_number, password):
     users.MobileNumber.create_mobile_number(mobile_number)
     clients.ClientKey.create_client_key(mobile_number, password)
+    print "Mobile user created! %s" % mobile_number
