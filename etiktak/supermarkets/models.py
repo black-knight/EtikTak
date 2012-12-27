@@ -28,7 +28,6 @@
 from django.db import models
 
 from django_google_maps import fields as map_fields
-from datetime import datetime
 
 class Supermarket(models.Model):
     name = models.CharField(max_length=255, unique=True)

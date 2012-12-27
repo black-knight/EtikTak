@@ -27,7 +27,6 @@
 
 from etiktak.util import util
 
-from datetime import datetime
 from django.db import models
 
 class MobileNumberManager(models.Manager):

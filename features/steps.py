@@ -25,6 +25,9 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+from etiktak.clients import models as clients
+from etiktak.util import util
+
 from lettuce import step
 from lettuce import world
 import api_handler
@@ -35,14 +38,19 @@ def given_i_apply_for_a_new_user_with_mobile_number_group1_and_password_group2(s
     world.password = group2
     api_handler.apply_for_user(world.mobile_number, world.password)
 
-@step(u'And I simulate an SMS with pincode "([^"]*)"')
-def and_i_simulate_an_sms_with_pincode_group1(step, group1):
-    world.sms_verification = group1
-    assert False, 'This step must be implemented'
+@step(u'And I check that a challenge has been created in the database')
+def and_I_check_that_a_challenge_has_been_created_in_the_database(step):
+    verifications = clients.SmsVerification.objects.filter(mobile_number_hash=util.sha256(world.mobile_number))
+    if verifications is None or len(verifications) == 0:
+        raise BaseException("No SMS verifications found in database")
+    # Override challenge with custom challenge
+    world.challenge = util.sha256(util.generate_challenge())
+    verification = verifications[0]
+    verification.challenge_hash = util.sha256(world.challenge)
 
-@step(u'Then I can register the user')
-def then_i_can_register_the_user(step):
-    assert False, 'This step must be implemented'
+@step(u'Then I can verify the user')
+def then_i_can_verify_the_user(step):
+    api_handler.verify_user(world.mobile_number, world.challenge)
 
 @step(u'And I can login')
 def and_i_can_login(step):

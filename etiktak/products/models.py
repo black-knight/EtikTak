@@ -28,7 +28,6 @@
 from etiktak.supermarkets import models as supermarkets
 from etiktak.clients import models as clients
 
-from datetime import datetime
 from django.db import models
 
 class ProductCategory(models.Model):

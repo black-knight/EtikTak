@@ -30,7 +30,8 @@ from lettuce.django import django_url
 from lettuce import world
 from django.test.client import Client
 
-APPLY_URL = "users/apply"
+APPLY_USER_URL = "users/apply"
+VERIFY_USER_URL = "users/verify"
 
 def parse_url(url, params = None):
     if params is None:
@@ -48,8 +49,12 @@ def call(url, params = None):
     world.response = world.client.get(django_url("/api/%s" % url), follow=True)
 
 def apply_for_user(mobile_number, password):
-    call(APPLY_URL, [("mobile_number", mobile_number), ("password", password)])
+    call(APPLY_USER_URL, [("mobile_number", mobile_number), ("password", password)])
     result = json.loads(world.response.content)
-    if result.get("result") != "OK":
+    if not result.get("result") == "OK":
         raise BaseException("Could not apply for user: %s" % result)
     return result
+
+
+def verify_user(mobile_number, challenge):
+    call(VERIFY_USER_URL, [("mobile_number", mobile_number), ("challenge", challenge)])

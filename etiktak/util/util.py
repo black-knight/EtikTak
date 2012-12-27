@@ -36,4 +36,4 @@ def getRequiredParam(request, param):
     return value
 
 def generate_challenge():
-    return uuid.uuid4()
+    return uuid.uuid4().hex

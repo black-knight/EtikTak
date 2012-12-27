@@ -27,8 +27,10 @@ from django.conf.urls import *
 from piston.resource import Resource
 from api.handlers import *
 
-create_user_handler = Resource(CreateUserHandler)
+create_user_handler = Resource(ApplyUserHandler)
+verify_user_handler = Resource(VerifyUserHandler)
 
 urlpatterns = patterns('',
     url(r'^users/apply/$', create_user_handler, { 'emitter_format' : 'json' }),
+    url(r'^users/verify/$', verify_user_handler, { 'emitter_format' : 'json' }),
 )

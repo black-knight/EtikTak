@@ -27,17 +27,27 @@ from etiktak.service import user_service
 from etiktak.util import util
 
 from piston.handler import BaseHandler
-from piston.emitters import *
 
-class CreateUserHandler(BaseHandler):
+class ApplyUserHandler(BaseHandler):
     allowed_methods = ('GET',)
-    Emitter.register('json', JSONEmitter, 'application/json; charset=utf-8')
 
-    def read(self, request, mobile_number=None):
+    def read(self, request, mobile_number=None, password=None):
         try:
             mobile_number = util.getRequiredParam(request, 'mobile_number')
             password = util.getRequiredParam(request, 'password')
             user_service.apply_for_user(mobile_number, password)
+            return {"result": "OK"}
+        except Exception as e:
+            return {"result": e}
+
+class VerifyUserHandler(BaseHandler):
+    allowed_methods = ('GET',)
+
+    def read(self, request, mobile_number=None, challenge=None):
+        try:
+            mobile_number = util.getRequiredParam(request, 'mobile_number')
+            challenge = util.getRequiredParam(request, 'challenge')
+            user_service.verify_user(mobile_number, challenge)
             return {"result": "OK"}
         except Exception as e:
             return {"result": e}
