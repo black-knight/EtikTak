@@ -33,7 +33,8 @@ from django.db import models
 
 class ProductCategory(models.Model):
     category = models.CharField(max_length=255, unique=True)
-    created_timestamp = models.DateTimeField()
+    created_timestamp = models.DateTimeField(auto_now_add=True)
+    updated_timestamp = models.DateTimeField(auto_now=True)
 
     @staticmethod
     def create_product_category(category):
@@ -41,7 +42,7 @@ class ProductCategory(models.Model):
         Creates and saves a product category with the specified
         category text.
         """
-        product_category = ProductCategory(category = category, created_timestamp = datetime.now())
+        product_category = ProductCategory(category = category)
         product_category.save()
         return product_category
 
@@ -56,7 +57,8 @@ class Product(models.Model):
     name = models.CharField(max_length=255)
     ean = models.CharField(max_length=100, unique=True)
     category = models.ForeignKey(ProductCategory)
-    created_timestamp = models.DateTimeField()
+    created_timestamp = models.DateTimeField(auto_now_add=True)
+    updated_timestamp = models.DateTimeField(auto_now=True)
 
     @staticmethod
     def create_product(name, ean, category):
@@ -64,7 +66,7 @@ class Product(models.Model):
         Creates and saves a product with the specified name,
         ean and category.
         """
-        product = Product(name = name, ean = ean, category = category, created_timestamp = datetime.now())
+        product = Product(name = name, ean = ean, category = category)
         product.save()
         return product
 
@@ -79,7 +81,8 @@ class ProductLocation(models.Model):
     product = models.ForeignKey(Product)
     supermarket_location = models.ForeignKey(supermarkets.SupermarketLocation)
     client = models.ForeignKey(clients.ClientKey)
-    created_timestamp = models.DateTimeField()
+    created_timestamp = models.DateTimeField(auto_now_add=True)
+    updated_timestamp = models.DateTimeField(auto_now=True)
 
     @staticmethod
     def create_product_location(product, supermarket_location, client):
@@ -87,7 +90,7 @@ class ProductLocation(models.Model):
         Creates and saves a product location for the specified product, supermarket
         location and client and with created timestamp (=scanned timestamp) set to now.
         """
-        location = ProductLocation(product = product, supermarket_location = supermarket_location, client = client, created_timestamp = datetime.now())
+        location = ProductLocation(product = product, supermarket_location = supermarket_location, client = client)
         location.save()
         return location
 

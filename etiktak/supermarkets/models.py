@@ -32,14 +32,15 @@ from datetime import datetime
 
 class Supermarket(models.Model):
     name = models.CharField(max_length=255, unique=True)
-    created_timestamp = models.DateTimeField()
+    created_timestamp = models.DateTimeField(auto_now_add=True)
+    updated_timestamp = models.DateTimeField(auto_now=True)
 
     @staticmethod
     def create_supermarket(name):
         """
         Creates and saves a supermarket with the specified name.
         """
-        supermarket = Supermarket(name = name, created_timestamp = datetime.now())
+        supermarket = Supermarket(name = name)
         supermarket.save()
         return supermarket
 
@@ -54,7 +55,8 @@ class SupermarketLocation(models.Model):
     address = map_fields.AddressField(max_length=200)
     geolocation = map_fields.GeoLocationField(max_length=100)
     supermarket = models.ForeignKey(Supermarket)
-    created_timestamp = models.DateTimeField()
+    created_timestamp = models.DateTimeField(auto_now_add=True)
+    updated_timestamp = models.DateTimeField(auto_now=True)
 
     @staticmethod
     def create_supermarket_location(address, geolocation, supermarket):
@@ -62,7 +64,7 @@ class SupermarketLocation(models.Model):
         Creates and saves a supermarket location with the specified address, geolocation and
         supermarket.
         """
-        location = SupermarketLocation(address = address, geolocation = geolocation, supermarket = supermarket, created_timestamp = datetime.now())
+        location = SupermarketLocation(address = address, geolocation = geolocation, supermarket = supermarket)
         location.save()
         return location
 

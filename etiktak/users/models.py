@@ -37,14 +37,15 @@ class MobileNumberManager(models.Manager):
 class User(models.Model):
     username = models.CharField(max_length=255, unique=True)
     email = models.EmailField(max_length=255, unique=True)
-    created_timestamp = models.DateTimeField()
+    created_timestamp = models.DateTimeField(auto_now_add=True)
+    updated_timestamp = models.DateTimeField(auto_now=True)
 
     @staticmethod
     def create_user(username, email):
         """
         Creates and saves a username with the specified username and email.
         """
-        user = User(username = username, email = email, created_timestamp = datetime.now())
+        user = User(username = username, email = email)
         user.save()
         return user
 
@@ -57,14 +58,15 @@ class User(models.Model):
 
 class UserCredentials(models.Model):
     credentials_hash = models.CharField(max_length=255)
-    created_timestamp = models.DateTimeField()
+    created_timestamp = models.DateTimeField(auto_now_add=True)
+    updated_timestamp = models.DateTimeField(auto_now=True)
 
     @staticmethod
     def create_user_credentials(password):
         """
         Creates and saves a hash of the specified password.
         """
-        credentials = UserCredentials(credentials_hash = util.sha256(password), created_timestamp = datetime.now())
+        credentials = UserCredentials(credentials_hash = util.sha256(password))
         credentials.save()
         return credentials
 
@@ -77,7 +79,8 @@ class UserCredentials(models.Model):
 
 class MobileNumber(models.Model):
     mobile_number_hash = models.CharField(max_length=255, unique=True) # EncryptedCharField(max_length=255)
-    created_timestamp = models.DateTimeField()
+    created_timestamp = models.DateTimeField(auto_now_add=True)
+    updated_timestamp = models.DateTimeField(auto_now=True)
 
     objects = MobileNumberManager()
 
@@ -88,7 +91,7 @@ class MobileNumber(models.Model):
         """
         if MobileNumber.objects.exists(mobile_number):
             raise ValueError("Mobile number %s already exists" % mobile_number)
-        m = MobileNumber(mobile_number_hash = util.sha256(mobile_number), created_timestamp = datetime.now())
+        m = MobileNumber(mobile_number_hash = util.sha256(mobile_number))
         m.save()
         return m
 
