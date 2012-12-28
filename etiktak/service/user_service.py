@@ -31,11 +31,11 @@ from etiktak.service import sms_service
 
 def apply_for_user(mobile_number, password):
     users.MobileNumber.create_mobile_number(mobile_number)
-    clients.ClientKey.create_client_key(mobile_number, password)
+    clients.Client.create_client_key(mobile_number, password)
     sms_service.generate_challenge(mobile_number)
-    print "User created: %s" % mobile_number
+    print "User created: %s\n" % mobile_number
 
 
 def verify_user(mobile_number, challenge):
     clients.SmsVerification.objects.verify_user(mobile_number, challenge)
-    print "User verified: %s" % mobile_number
+    print "User verified: %s\n" % mobile_number

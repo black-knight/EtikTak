@@ -47,13 +47,14 @@ def and_I_check_that_a_challenge_has_been_created_in_the_database(step):
     world.challenge = util.sha256(util.generate_challenge())
     verification = verifications[0]
     verification.challenge_hash = util.sha256(world.challenge)
+    verification.save()
 
 @step(u'Then I can verify the user')
 def then_i_can_verify_the_user(step):
     api_handler.verify_user(world.mobile_number, world.challenge)
 
-@step(u'And I can login')
-def and_i_can_login(step):
+@step(u'And I can contribute to crowd database')
+def and_i_can_contribute_to_crowd_database(step):
     assert False, 'This step must be implemented'
 
 @step(u'Given there is already a user with mobile number "([^"]*)"')

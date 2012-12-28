@@ -29,4 +29,4 @@ from etiktak.clients import models as clients
 
 def generate_challenge(mobile_number):
     clients.SmsVerification.create_challenge(mobile_number)
-    print "Generated challenge for mobile number: %s" % mobile_number
+    print "Generated challenge for mobile number: %s\n" % mobile_number

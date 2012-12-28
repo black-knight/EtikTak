@@ -55,27 +55,6 @@ class User(models.Model):
         verbose_name = u"Bruger"
         verbose_name_plural = u"Brugere"
 
-class UserCredentials(models.Model):
-    credentials_hash = models.CharField(max_length=255)
-    created_timestamp = models.DateTimeField(auto_now_add=True)
-    updated_timestamp = models.DateTimeField(auto_now=True)
-
-    @staticmethod
-    def create_user_credentials(password):
-        """
-        Creates and saves a hash of the specified password.
-        """
-        credentials = UserCredentials(credentials_hash = util.sha256(password))
-        credentials.save()
-        return credentials
-
-    def __unicode__(self):
-        return u"%s" % self.credentials_hash
-
-    class Meta:
-        verbose_name = u"Bruger kodeord"
-        verbose_name_plural = u"Bruger kodeord"
-
 class MobileNumber(models.Model):
     mobile_number_hash = models.CharField(max_length=255, unique=True) # EncryptedCharField(max_length=255)
     created_timestamp = models.DateTimeField(auto_now_add=True)

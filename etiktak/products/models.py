@@ -79,7 +79,7 @@ class Product(models.Model):
 class ProductLocation(models.Model):
     product = models.ForeignKey(Product)
     supermarket_location = models.ForeignKey(supermarkets.SupermarketLocation)
-    client = models.ForeignKey(clients.ClientKey)
+    client = models.ForeignKey(clients.Client)
     created_timestamp = models.DateTimeField(auto_now_add=True)
     updated_timestamp = models.DateTimeField(auto_now=True)
 
