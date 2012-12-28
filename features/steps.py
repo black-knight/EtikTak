@@ -51,7 +51,15 @@ def and_I_check_that_a_challenge_has_been_created_in_the_database(step):
 
 @step(u'Then I can verify the user')
 def then_i_can_verify_the_user(step):
-    api_handler.verify_user(world.mobile_number, world.challenge)
+    api_handler.verify_user(world.mobile_number, world.password, world.challenge)
+
+@step(u'Then I cannot verify the user with incorrect challenge')
+def then_i_cannot_verify_the_user_with_incorrect_challenge(step):
+    try:
+        api_handler.verify_user(world.mobile_number, world.password, "VERY UNLIKELY CHALLENGE")
+        raise BaseException("Was able to verify client with incorrect challenge")
+    except api_handler.WebserviceException:
+        pass
 
 @step(u'And I can contribute to crowd database')
 def and_i_can_contribute_to_crowd_database(step):

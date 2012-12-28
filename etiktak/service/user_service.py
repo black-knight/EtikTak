@@ -36,6 +36,6 @@ def apply_for_user(mobile_number, password):
     print "User created: %s\n" % mobile_number
 
 
-def verify_user(mobile_number, challenge):
-    clients.SmsVerification.objects.verify_user(mobile_number, challenge)
+def verify_user(mobile_number, password, challenge):
+    clients.SmsVerification.objects.verify_user(mobile_number, password, challenge)
     print "User verified: %s\n" % mobile_number

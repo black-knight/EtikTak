@@ -33,6 +33,14 @@ from django.test.client import Client
 APPLY_USER_URL = "users/apply"
 VERIFY_USER_URL = "users/verify"
 
+class WebserviceException(BaseException):
+    def __init__(self, message):
+        BaseException.__init__(self, message)
+
+def verify_json_result(json, expected):
+    if not json.get("result") == expected:
+        raise WebserviceException("Unexpected result from webservice: %s" % json)
+
 def parse_url(url, params = None):
     if params is None:
         return url
@@ -44,17 +52,22 @@ def parse_url(url, params = None):
     return url
 
 def call(url, params = None):
-    url = parse_url(url, params)
-    world.client = Client()
-    world.response = world.client.get(django_url("/api/%s" % url), follow=True)
+    try:
+        url = parse_url(url, params)
+        world.client = Client()
+        world.response = world.client.get(django_url("/api/%s" % url), follow=True)
+    except BaseException as e:
+        raise WebserviceException(e)
 
 def apply_for_user(mobile_number, password):
     call(APPLY_USER_URL, [("mobile_number", mobile_number), ("password", password)])
     result = json.loads(world.response.content)
-    if not result.get("result") == "OK":
-        raise BaseException("Could not apply for user: %s" % result)
+    verify_json_result(result, "OK")
     return result
 
 
-def verify_user(mobile_number, challenge):
-    call(VERIFY_USER_URL, [("mobile_number", mobile_number), ("challenge", challenge)])
+def verify_user(mobile_number, password, challenge):
+    call(VERIFY_USER_URL, [("mobile_number", mobile_number), ("password", password), ("challenge", challenge)])
+    result = json.loads(world.response.content)
+    verify_json_result(result, "OK")
+    return result

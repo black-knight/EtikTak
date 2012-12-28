@@ -43,11 +43,12 @@ class ApplyUserHandler(BaseHandler):
 class VerifyUserHandler(BaseHandler):
     allowed_methods = ('GET',)
 
-    def read(self, request, mobile_number=None, challenge=None):
+    def read(self, request, mobile_number=None, password=None, challenge=None):
         try:
             mobile_number = util.getRequiredParam(request, 'mobile_number')
+            password = util.getRequiredParam(request, 'password')
             challenge = util.getRequiredParam(request, 'challenge')
-            user_service.verify_user(mobile_number, challenge)
+            user_service.verify_user(mobile_number, password, challenge)
             return {"result": "OK"}
         except Exception as e:
             return {"result": e}
