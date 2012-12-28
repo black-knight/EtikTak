@@ -26,11 +26,21 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from etiktak.clients import models as clients
+from etiktak.products import models as products
 from etiktak.util import util
 
 from lettuce import step
 from lettuce import world
 import api_handler
+
+import random
+
+def create_random_product():
+    product_ean = "test_ean_%f" % random.random()
+    category = products.ProductCategory.create_product_category("test_category_%f" % random.random())
+    return products.Product.create_product("test_product_%f" % random.random(), product_ean, category)
+
+
 
 @step(u'Given I apply for a new user with mobile number "([^"]*)" and password "([^"]*)"')
 def given_i_apply_for_a_new_user_with_mobile_number_group1_and_password_group2(step, group1, group2):
@@ -40,12 +50,9 @@ def given_i_apply_for_a_new_user_with_mobile_number_group1_and_password_group2(s
 
 @step(u'And I check that a challenge has been created in the database')
 def and_I_check_that_a_challenge_has_been_created_in_the_database(step):
-    verifications = clients.SmsVerification.objects.filter(mobile_number_hash=util.sha256(world.mobile_number))
-    if verifications is None or len(verifications) == 0:
-        raise BaseException("No SMS verifications found in database")
+    verification = clients.SmsVerification.objects.get(world.mobile_number)
     # Override challenge with custom challenge
     world.challenge = util.sha256(util.generate_challenge())
-    verification = verifications[0]
     verification.challenge_hash = util.sha256(world.challenge)
     verification.save()
 
@@ -61,9 +68,19 @@ def then_i_cannot_verify_the_user_with_incorrect_challenge(step):
     except api_handler.WebserviceException:
         pass
 
-@step(u'And I can contribute to the crowd database')
-def and_i_can_contribute_to_crowd_database(step):
-    api_handler.create_product_location(world.mobile_number, world.password, "EAN: 1234", "1, 2")
+@step(u'And I can contribute to the crowd database on an existing product')
+def and_i_can_contribute_to_crowd_database_on_an_existing_product(step):
+    product = create_random_product()
+    api_handler.create_product_location(world.mobile_number, world.password, product.ean, "1.0, 2.0")
+
+@step(u'Then I can contribute to the crowd database on an existing product')
+def then_i_can_contribute_to_the_crowd_database_on_an_existing_product(step):
+    product = create_random_product()
+    try:
+        api_handler.create_product_location(world.mobile_number, world.password, product.ean, "1.0, 2.0")
+        raise BaseException("Was able to contribute even though not verified")
+    except api_handler.WebserviceException:
+        pass
 
 @step(u'Given there is already a user with mobile number "([^"]*)"')
 def given_there_is_already_a_user_with_mobile_number_group1(step, group1):

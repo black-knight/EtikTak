@@ -32,15 +32,21 @@ from etiktak.util import util
 from django.db import models
 
 class SmsVerificationManager(models.Manager):
+    def get(self, mobile_number):
+        verifications = self.filter(mobile_number_hash=util.sha256(mobile_number))
+        if verifications is None or not len(verifications) == 1:
+            raise BaseException("No challenge found for mobile number: %s" % mobile_number)
+        return verifications[0]
+
     def verify_user(self, mobile_number, password, challenge):
         verifications = self.filter(mobile_number_hash=util.sha256(mobile_number))
-        if verifications is None or len(verifications) == 0:
+        if verifications is None or not len(verifications) == 1:
             raise BaseException("No challenge found for mobile number: %s" % mobile_number)
         verification = verifications[0]
         if not verification.challenge_hash == util.sha256(challenge):
             raise BaseException("Provided challenge for mobile number %s doesn't match" % mobile_number)
         clients = Client.objects.filter(mobile_number_hash_password_hash_hashed=util.sha256(util.sha256(mobile_number) + util.sha256(password)))
-        if clients is None or len(clients) == 0:
+        if clients is None or not len(clients) == 1:
             raise BaseException("No client found for mobile number: %s" % mobile_number)
         client = clients[0]
         client.verified = True
