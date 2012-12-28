@@ -46,12 +46,19 @@ class SmsVerificationManager(models.Manager):
         client.verified = True
         client.save()
 
+class ClientManager(models.Manager):
+    def get(self, mobile_number, password):
+        clients = self.filter(mobile_number_hash_password_hash_hashed=util.sha256(util.sha256(mobile_number) + util.sha256(password)))
+        return clients[0]
+
 class Client(models.Model):
     uid = models.CharField(max_length=255, unique=True) # EncryptedCharField(max_length=255)
     mobile_number_hash_password_hash_hashed = models.CharField(max_length=255, unique=True) # EncryptedCharField(max_length=255)
     verified = models.BooleanField(default=False)
     created_timestamp = models.DateTimeField(auto_now_add=True)
     updated_timestamp = models.DateTimeField(auto_now=True)
+
+    objects = ClientManager()
 
     @staticmethod
     def create_client_key(mobile_number, password):

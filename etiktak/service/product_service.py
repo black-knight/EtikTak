@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 # Copyright (c) 2012, Daniel Andersen (dani_ande@yahoo.dk)
 # All rights reserved.
 #
@@ -23,17 +25,11 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from django.conf.urls import *
-from piston.resource import Resource
-from api.user_handlers import *
-from api.product_handlers import *
+from etiktak.clients.models import Client
+from etiktak.products.models import *
 
-create_user_handler = Resource(ApplyUserHandler)
-verify_user_handler = Resource(VerifyUserHandler)
-create_product_location_handler = Resource(CreateProductLocationHandler)
-
-urlpatterns = patterns('',
-    url(r'^users/apply/$', create_user_handler, { 'emitter_format' : 'json' }),
-    url(r'^users/verify/$', verify_user_handler, { 'emitter_format' : 'json' }),
-    url(r'^products/scan_location/$', create_product_location_handler, { 'emitter_format' : 'json' }),
-)
+def create_product_location(mobile_number, password, ean, geo_location):
+    client = Client.objects.get(mobile_number, password)
+    product = Product.objects.get(ean=ean)
+    ProductLocation.create_product_location(product, geo_location, client)
+    print "Created product location for mobile number: %s and EAN: %s\n" % (mobile_number, ean)

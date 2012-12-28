@@ -28,6 +28,7 @@
 from etiktak.supermarkets import models as supermarkets
 from etiktak.clients import models as clients
 
+from django_google_maps import fields as map_fields
 from django.db import models
 
 class ProductCategory(models.Model):
@@ -78,23 +79,24 @@ class Product(models.Model):
 
 class ProductLocation(models.Model):
     product = models.ForeignKey(Product)
-    supermarket_location = models.ForeignKey(supermarkets.SupermarketLocation)
+    supermarket_location = models.ForeignKey(supermarkets.SupermarketLocation, default=None)
+    scanned_location = map_fields.GeoLocationField(max_length=100)
     client = models.ForeignKey(clients.Client)
     created_timestamp = models.DateTimeField(auto_now_add=True)
     updated_timestamp = models.DateTimeField(auto_now=True)
 
     @staticmethod
-    def create_product_location(product, supermarket_location, client):
+    def create_product_location(product, scanned_location, client):
         """
-        Creates and saves a product location for the specified product, supermarket
+        Creates and saves a product location for the specified product, scanned
         location and client and with created timestamp (=scanned timestamp) set to now.
         """
-        location = ProductLocation(product = product, supermarket_location = supermarket_location, client = client)
+        location = ProductLocation(product = product, scanned_location = scanned_location, client = client)
         location.save()
         return location
 
     def __unicode__(self):
-        return u"%s" % self.supermarket_location
+        return u"%s | %s" % (self.supermarket_location, self.scanned_location)
 
     class Meta:
         verbose_name = u"Produktlokation"

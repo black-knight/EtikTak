@@ -32,6 +32,7 @@ from django.test.client import Client
 
 APPLY_USER_URL = "users/apply"
 VERIFY_USER_URL = "users/verify"
+CREATE_PRODUCT_LOCATION_URL = "products/scan_location"
 
 class WebserviceException(BaseException):
     def __init__(self, message):
@@ -68,6 +69,12 @@ def apply_for_user(mobile_number, password):
 
 def verify_user(mobile_number, password, challenge):
     call(VERIFY_USER_URL, [("mobile_number", mobile_number), ("password", password), ("challenge", challenge)])
+    result = json.loads(world.response.content)
+    verify_json_result(result, "OK")
+    return result
+
+def create_product_location(mobile_number, password, ean, geo_location):
+    call(CREATE_PRODUCT_LOCATION_URL, [("mobile_number", mobile_number), ("password", password), ("ean", ean), ("geo_location", geo_location)])
     result = json.loads(world.response.content)
     verify_json_result(result, "OK")
     return result

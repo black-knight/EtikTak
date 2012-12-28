@@ -4,7 +4,7 @@ Scenario: I can create a user
     Given I apply for a new user with mobile number "12345678" and password "Test1234"
     And I check that a challenge has been created in the database
     Then I can verify the user
-    And I can contribute to crowd database
+    And I can contribute to the crowd database
 
 Scenario: I cannot verify user with incorrect SMS challenge
     Given I apply for a new user with mobile number "23456789" and password "Test1234"

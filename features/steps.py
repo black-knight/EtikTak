@@ -61,9 +61,9 @@ def then_i_cannot_verify_the_user_with_incorrect_challenge(step):
     except api_handler.WebserviceException:
         pass
 
-@step(u'And I can contribute to crowd database')
+@step(u'And I can contribute to the crowd database')
 def and_i_can_contribute_to_crowd_database(step):
-    assert False, 'This step must be implemented'
+    api_handler.create_product_location(world.mobile_number, world.password, "EAN: 1234", "1, 2")
 
 @step(u'Given there is already a user with mobile number "([^"]*)"')
 def given_there_is_already_a_user_with_mobile_number_group1(step, group1):

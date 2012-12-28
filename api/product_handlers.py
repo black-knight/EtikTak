@@ -23,17 +23,21 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from django.conf.urls import *
-from piston.resource import Resource
-from api.user_handlers import *
-from api.product_handlers import *
+from etiktak.service import product_service
+from etiktak.util import util
 
-create_user_handler = Resource(ApplyUserHandler)
-verify_user_handler = Resource(VerifyUserHandler)
-create_product_location_handler = Resource(CreateProductLocationHandler)
+from piston.handler import BaseHandler
 
-urlpatterns = patterns('',
-    url(r'^users/apply/$', create_user_handler, { 'emitter_format' : 'json' }),
-    url(r'^users/verify/$', verify_user_handler, { 'emitter_format' : 'json' }),
-    url(r'^products/scan_location/$', create_product_location_handler, { 'emitter_format' : 'json' }),
-)
+class CreateProductLocationHandler(BaseHandler):
+    allowed_methods = ('GET',)
+
+    def read(self, request, mobile_number=None, password=None, ean=None, geo_location=None):
+        try:
+            mobile_number = util.getRequiredParam(request, 'mobile_number')
+            password = util.getRequiredParam(request, 'password')
+            ean = util.getRequiredParam(request, 'ean')
+            geo_location = util.getRequiredParam(request, 'geo_location')
+            product_service.create_product_location(mobile_number, password, ean, geo_location)
+            return {"result": "OK"}
+        except Exception as e:
+            return {"result": e}
