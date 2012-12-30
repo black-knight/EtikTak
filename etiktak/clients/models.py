@@ -31,27 +31,6 @@ from etiktak.util import util
 
 from django.db import models
 
-class SmsVerificationManager(models.Manager):
-    def get(self, mobile_number):
-        verifications = self.filter(mobile_number_hash=util.sha256(mobile_number))
-        if verifications is None or not len(verifications) == 1:
-            raise BaseException("No challenge found for mobile number: %s" % mobile_number)
-        return verifications[0]
-
-    def verify_user(self, mobile_number, password, challenge):
-        verifications = self.filter(mobile_number_hash=util.sha256(mobile_number))
-        if verifications is None or not len(verifications) == 1:
-            raise BaseException("No challenge found for mobile number: %s" % mobile_number)
-        verification = verifications[0]
-        if not verification.challenge_hash == util.sha256(challenge):
-            raise BaseException("Provided challenge for mobile number %s doesn't match" % mobile_number)
-        clients = Client.objects.filter(mobile_number_hash_password_hash_hashed=util.sha256(util.sha256(mobile_number) + util.sha256(password)))
-        if clients is None or not len(clients) == 1:
-            raise BaseException("No client found for mobile number: %s" % mobile_number)
-        client = clients[0]
-        client.verified = True
-        client.save()
-
 class ClientManager(models.Manager):
     def get(self, mobile_number, password):
         clients = self.filter(mobile_number_hash_password_hash_hashed=util.sha256(util.sha256(mobile_number) + util.sha256(password)))
@@ -87,6 +66,28 @@ class Client(models.Model):
         verbose_name_plural = u"Klientnøgler"
 
 
+
+class SmsVerificationManager(models.Manager):
+    def get(self, mobile_number):
+        verifications = self.filter(mobile_number_hash=util.sha256(mobile_number))
+        if verifications is None or not len(verifications) == 1:
+            raise BaseException("No challenge found for mobile number: %s" % mobile_number)
+        return verifications[0]
+
+    def verify_user(self, mobile_number, password, challenge):
+        verifications = self.filter(mobile_number_hash=util.sha256(mobile_number))
+        if verifications is None or not len(verifications) == 1:
+            raise BaseException("No challenge found for mobile number: %s" % mobile_number)
+        verification = verifications[0]
+        if not verification.challenge_hash == util.sha256(challenge):
+            raise BaseException("Provided challenge for mobile number %s doesn't match" % mobile_number)
+        clients = Client.objects.filter(mobile_number_hash_password_hash_hashed=util.sha256(util.sha256(mobile_number) + util.sha256(password)))
+        if clients is None or not len(clients) == 1:
+            raise BaseException("No client found for mobile number: %s" % mobile_number)
+        client = clients[0]
+        client.verified = True
+        client.save()
+
 class SmsVerification(models.Model):
     challenge_hash = models.CharField(max_length=255) # EncryptedCharField(max_length=255)
     mobile_number_hash = models.CharField(max_length=255, unique=True) # EncryptedCharField(max_length=255)
@@ -107,8 +108,39 @@ class SmsVerification(models.Model):
         return sms_verification
 
     def __unicode__(self):
-        return u"%s | %s | %s" % (self.challenge_hash, self.mobile_number_hash, self.verified)
+        return u"%s | %s" % (self.challenge_hash, self.mobile_number_hash)
 
     class Meta:
         verbose_name = u"SMS verifikation"
         verbose_name_plural = u"SMS verifikationer"
+
+
+
+class MobileNumberManager(models.Manager):
+    def exists(self, mobile_number):
+        return self.filter(mobile_number_hash = util.sha256(mobile_number)).exists()
+
+class MobileNumber(models.Model):
+    mobile_number_hash = models.CharField(max_length=255, unique=True) # EncryptedCharField(max_length=255)
+    created_timestamp = models.DateTimeField(auto_now_add=True)
+    updated_timestamp = models.DateTimeField(auto_now=True)
+
+    objects = MobileNumberManager()
+
+    @staticmethod
+    def create_mobile_number(mobile_number):
+        """
+        Creates and saves the hash of the specified mobile number.
+        """
+        if MobileNumber.objects.exists(mobile_number):
+            raise ValueError("Mobile number %s already exists" % mobile_number)
+        m = MobileNumber(mobile_number_hash = util.sha256(mobile_number))
+        m.save()
+        return m
+
+    def __unicode__(self):
+        return u"%s" % self.mobile_number_hash
+
+    class Meta:
+        verbose_name = u"Mobilnummer"
+        verbose_name_plural = u"Mobilnumre"

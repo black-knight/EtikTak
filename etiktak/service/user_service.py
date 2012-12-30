@@ -26,11 +26,10 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from etiktak.clients import models as clients
-from etiktak.users import models as users
 from etiktak.service import sms_service
 
 def apply_for_user(mobile_number, password):
-    users.MobileNumber.create_mobile_number(mobile_number)
+    clients.MobileNumber.create_mobile_number(mobile_number)
     clients.Client.create_client_key(mobile_number, password)
     sms_service.generate_challenge(mobile_number)
     print "User created: %s\n" % mobile_number

@@ -143,7 +143,6 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
     'etiktak.util',
     'etiktak.clients',
-    'etiktak.users',
     'etiktak.supermarkets',
     'etiktak.products',
 )
