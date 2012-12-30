@@ -73,8 +73,8 @@ def verify_user(mobile_number, password, challenge):
     verify_json_result(result, "OK")
     return result
 
-def create_product_location(mobile_number, password, ean, geo_location):
-    call(CREATE_PRODUCT_LOCATION_URL, [("mobile_number", mobile_number), ("password", password), ("ean", ean), ("geo_location", geo_location)])
+def create_product_location(mobile_number, password, barcode, barcode_type, geo_location):
+    call(CREATE_PRODUCT_LOCATION_URL, [("mobile_number", mobile_number), ("password", password), ("barcode", barcode), ("barcode_type", barcode_type), ("geo_location", geo_location)])
     result = json.loads(world.response.content)
     verify_json_result(result, "OK")
     return result

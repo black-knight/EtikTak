@@ -31,13 +31,14 @@ from piston.handler import BaseHandler
 class CreateProductLocationHandler(BaseHandler):
     allowed_methods = ('GET',)
 
-    def read(self, request, mobile_number=None, password=None, ean=None, geo_location=None):
+    def read(self, request, mobile_number=None, password=None, barcode=None, barcode_type=None, geo_location=None):
         try:
             mobile_number = util.getRequiredParam(request, 'mobile_number')
             password = util.getRequiredParam(request, 'password')
-            ean = util.getRequiredParam(request, 'ean')
+            barcode = util.getRequiredParam(request, 'barcode')
+            barcode_type = util.getRequiredParam(request, 'barcode_type')
             geo_location = util.getRequiredParam(request, 'geo_location')
-            product_service.create_product_location(mobile_number, password, ean, geo_location)
+            product_service.create_product_location(mobile_number, password, barcode, barcode_type, geo_location)
             return {"result": "OK"}
         except Exception as e:
             return {"result": e}

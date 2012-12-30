@@ -37,3 +37,6 @@ def getRequiredParam(request, param):
 
 def generate_challenge():
     return uuid.uuid4().hex
+
+def enum(**enums):
+    return type('Enum', (), enums)

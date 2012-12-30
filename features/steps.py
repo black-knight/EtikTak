@@ -36,9 +36,9 @@ import api_handler
 import random
 
 def create_random_product():
-    product_ean = "test_ean_%f" % random.random()
+    product_barcode = "test_barcode_%f" % random.random()
     category = products.ProductCategory.create_product_category("test_category_%f" % random.random())
-    return products.Product.create_product("test_product_%f" % random.random(), product_ean, category)
+    return products.Product.create_product("test_product_%f" % random.random(), product_barcode, products.BARCODE_TYPE.EAN13, category)
 
 
 
@@ -71,13 +71,13 @@ def then_i_cannot_verify_the_user_with_incorrect_challenge(step):
 @step(u'And I can contribute to the crowd database on an existing product')
 def and_i_can_contribute_to_crowd_database_on_an_existing_product(step):
     product = create_random_product()
-    api_handler.create_product_location(world.mobile_number, world.password, product.ean, "1.0, 2.0")
+    api_handler.create_product_location(world.mobile_number, world.password, product.barcode, products.BARCODE_TYPE.EAN13, "1.0, 2.0")
 
 @step(u'Then I can contribute to the crowd database on an existing product')
 def then_i_can_contribute_to_the_crowd_database_on_an_existing_product(step):
     product = create_random_product()
     try:
-        api_handler.create_product_location(world.mobile_number, world.password, product.ean, "1.0, 2.0")
+        api_handler.create_product_location(world.mobile_number, world.password, product.barcode, products.BARCODE_TYPE.EAN13, "1.0, 2.0")
         raise BaseException("Was able to contribute even though not verified")
     except api_handler.WebserviceException:
         pass

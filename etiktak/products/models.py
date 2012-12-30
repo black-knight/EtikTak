@@ -28,8 +28,14 @@
 from etiktak.supermarkets import models as supermarkets
 from etiktak.clients import models as clients
 
+from etiktak.util import util
+
 from django_google_maps import fields as map_fields
 from django.db import models
+
+BARCODE_TYPE = util.enum(
+    EAN13="EAN13",
+    UPC="UPC")
 
 class ProductCategory(models.Model):
     category = models.CharField(max_length=255, unique=True)
@@ -55,23 +61,24 @@ class ProductCategory(models.Model):
 
 class Product(models.Model):
     name = models.CharField(max_length=255)
-    ean = models.CharField(max_length=100, unique=True)
+    barcode = models.CharField(max_length=100, unique=True)
+    barcode_type = models.CharField(max_length=64)
     category = models.ForeignKey(ProductCategory)
     created_timestamp = models.DateTimeField(auto_now_add=True)
     updated_timestamp = models.DateTimeField(auto_now=True)
 
     @staticmethod
-    def create_product(name, ean, category):
+    def create_product(name, barcode, barcode_type, category):
         """
         Creates and saves a product with the specified name,
-        ean and category.
+        barcode and category.
         """
-        product = Product(name = name, ean = ean, category = category)
+        product = Product(name = name, barcode = barcode, barcode_type = barcode_type, category = category)
         product.save()
         return product
 
     def __unicode__(self):
-        return u"%s | %s" % (self.product_name, self.product_ean)
+        return u"%s | %s | %s" % (self.name, self.barcode_type, self.barcode)
 
     class Meta:
         verbose_name = u"Produkt"
