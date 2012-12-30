@@ -53,8 +53,8 @@ class Client(models.Model):
         password hashed.
         """
         client_key = Client(
-            uid = uuid.uuid4(),
-            mobile_number_hash_password_hash_hashed = util.sha256(util.sha256(mobile_number) + util.sha256(password)))
+            uid=uuid.uuid4(),
+            mobile_number_hash_password_hash_hashed=util.sha256(util.sha256(mobile_number) + util.sha256(password)))
         client_key.save()
         return client_key
 

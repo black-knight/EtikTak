@@ -73,7 +73,7 @@ class Product(models.Model):
         Creates and saves a product with the specified name,
         barcode and category.
         """
-        product = Product(name = name, barcode = barcode, barcode_type = barcode_type, category = category)
+        product = Product(name=name, barcode=barcode, barcode_type=barcode_type, category=category)
         product.save()
         return product
 
@@ -101,7 +101,7 @@ class ProductLocation(models.Model):
         """
         if not client.verified:
             raise BaseException("Client attempted to contribute though not verified")
-        location = ProductLocation(product = product, scanned_location = scanned_location, client = client)
+        location = ProductLocation(product=product, scanned_location=scanned_location, client=client)
         location.save()
         return location
 

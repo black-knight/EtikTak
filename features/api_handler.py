@@ -52,7 +52,7 @@ def parse_url(url, params = None):
         first = False
     return url
 
-def call(url, params = None):
+def call(url, params=None):
     try:
         url = parse_url(url, params)
         world.client = Client()

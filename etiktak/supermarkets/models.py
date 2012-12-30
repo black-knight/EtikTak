@@ -39,7 +39,7 @@ class Supermarket(models.Model):
         """
         Creates and saves a supermarket with the specified name.
         """
-        supermarket = Supermarket(name = name)
+        supermarket = Supermarket(name=name)
         supermarket.save()
         return supermarket
 
@@ -63,7 +63,7 @@ class SupermarketLocation(models.Model):
         Creates and saves a supermarket location with the specified address, geolocation and
         supermarket.
         """
-        location = SupermarketLocation(address = address, geolocation = geolocation, supermarket = supermarket)
+        location = SupermarketLocation(address=address, geolocation=geolocation, supermarket=supermarket)
         location.save()
         return location
 
