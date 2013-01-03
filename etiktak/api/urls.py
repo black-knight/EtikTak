@@ -34,7 +34,7 @@ verify_user_handler = Resource(VerifyUserHandler)
 create_product_location_handler = Resource(CreateProductLocationHandler)
 
 urlpatterns = patterns('',
-    url(r'^users/apply/$', create_user_handler, { 'emitter_format' : 'json' }),
-    url(r'^users/verify/$', verify_user_handler, { 'emitter_format' : 'json' }),
-    url(r'^products/scan_location/$', create_product_location_handler, { 'emitter_format' : 'json' }),
+    url(r'^users/apply/(?P<mobile_number>[^/]+)/(?P<password>[^/]+)/$', create_user_handler, { 'emitter_format' : 'json' }),
+    url(r'^users/verify/(?P<mobile_number>[^/]+)/(?P<password>[^/]+)/(?P<challenge>[^/]+)/$', verify_user_handler, { 'emitter_format' : 'json' }),
+    url(r'^products/scan_location/(?P<mobile_number>[^/]+)/(?P<password>[^/]+)/(?P<barcode>[^/]+)/(?P<barcode_type>[^/]+)/(?P<geo_location>[^/]+)/$', create_product_location_handler, { 'emitter_format' : 'json' }),
 )

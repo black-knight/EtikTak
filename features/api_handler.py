@@ -45,11 +45,9 @@ def verify_json_result(json, expected):
 def parse_url(url, params = None):
     if params is None:
         return url
-    first = True
-    for (key, value) in params:
-        url += "?" if first else "&"
-        url += key + "=" + value
-        first = False
+    url += "/"
+    for param in params:
+        url += param + "/"
     return url
 
 def call(url, params=None):
@@ -61,20 +59,20 @@ def call(url, params=None):
         raise WebserviceException(e)
 
 def apply_for_user(mobile_number, password):
-    call(APPLY_USER_URL, [("mobile_number", mobile_number), ("password", password)])
+    call(APPLY_USER_URL, [mobile_number, password])
     result = json.loads(world.response.content)
     verify_json_result(result, "OK")
     return result
 
 
 def verify_user(mobile_number, password, challenge):
-    call(VERIFY_USER_URL, [("mobile_number", mobile_number), ("password", password), ("challenge", challenge)])
+    call(VERIFY_USER_URL, [mobile_number, password, challenge])
     result = json.loads(world.response.content)
     verify_json_result(result, "OK")
     return result
 
 def create_product_location(mobile_number, password, barcode, barcode_type, geo_location):
-    call(CREATE_PRODUCT_LOCATION_URL, [("mobile_number", mobile_number), ("password", password), ("barcode", barcode), ("barcode_type", barcode_type), ("geo_location", geo_location)])
+    call(CREATE_PRODUCT_LOCATION_URL, [mobile_number, password, barcode, barcode_type, geo_location])
     result = json.loads(world.response.content)
     verify_json_result(result, "OK")
     return result

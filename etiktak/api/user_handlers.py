@@ -23,7 +23,6 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from etiktak.util import util
 from etiktak.service import user_service
 
 from piston.handler import BaseHandler
@@ -33,8 +32,6 @@ class ApplyUserHandler(BaseHandler):
 
     def read(self, request, mobile_number=None, password=None):
         try:
-            mobile_number = util.getRequiredParam(request, 'mobile_number')
-            password = util.getRequiredParam(request, 'password')
             user_service.apply_for_user(mobile_number, password)
             return {"result": "OK"}
         except Exception as e:
@@ -45,9 +42,6 @@ class VerifyUserHandler(BaseHandler):
 
     def read(self, request, mobile_number=None, password=None, challenge=None):
         try:
-            mobile_number = util.getRequiredParam(request, 'mobile_number')
-            password = util.getRequiredParam(request, 'password')
-            challenge = util.getRequiredParam(request, 'challenge')
             user_service.verify_user(mobile_number, password, challenge)
             return {"result": "OK"}
         except Exception as e:
