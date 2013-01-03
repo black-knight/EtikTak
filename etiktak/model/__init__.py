@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 # Copyright (c) 2012, Daniel Andersen (dani_ande@yahoo.dk)
 # All rights reserved.
 #
@@ -22,11 +24,3 @@
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-from etiktak.products.models import *
-
-from django.contrib import admin
-
-admin.site.register(ProductCategory)
-admin.site.register(Product)
-

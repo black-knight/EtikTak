@@ -23,22 +23,10 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from etiktak.service import product_service
-from etiktak.util import util
+from etiktak.model.products import models as products
 
-from piston.handler import BaseHandler
+from django.contrib import admin
 
-class CreateProductLocationHandler(BaseHandler):
-    allowed_methods = ('GET',)
+admin.site.register(products.ProductCategory)
+admin.site.register(products.Product)
 
-    def read(self, request, mobile_number=None, password=None, barcode=None, barcode_type=None, geo_location=None):
-        try:
-            mobile_number = util.getRequiredParam(request, 'mobile_number')
-            password = util.getRequiredParam(request, 'password')
-            barcode = util.getRequiredParam(request, 'barcode')
-            barcode_type = util.getRequiredParam(request, 'barcode_type')
-            geo_location = util.getRequiredParam(request, 'geo_location')
-            product_service.create_product_location(mobile_number, password, barcode, barcode_type, geo_location)
-            return {"result": "OK"}
-        except Exception as e:
-            return {"result": e}

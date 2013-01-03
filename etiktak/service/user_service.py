@@ -25,7 +25,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from etiktak.clients import models as clients
+from etiktak.model.clients import models as clients
 from etiktak.service import sms_service
 
 def apply_for_user(mobile_number, password):

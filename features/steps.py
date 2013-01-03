@@ -25,13 +25,14 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from etiktak.clients import models as clients
-from etiktak.products import models as products
 from etiktak.util import util
+from etiktak.model.clients import models as clients
+from etiktak.model.products import models as products
+
+import api_handler
 
 from lettuce import step
 from lettuce import world
-import api_handler
 
 import random
 

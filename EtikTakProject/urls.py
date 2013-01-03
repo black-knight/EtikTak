@@ -42,7 +42,7 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
 
     # API (webservice)
-    (r'^api/', include('api.urls')),
+    (r'^api/', include('etiktak.api.urls')),
 
     # Main page
     (r'^$', TemplateView.as_view(template_name="index.html")),

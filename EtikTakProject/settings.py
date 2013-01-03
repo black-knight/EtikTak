@@ -142,9 +142,9 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     # 'django.contrib.admindocs',
     'etiktak.util',
-    'etiktak.clients',
-    'etiktak.supermarkets',
-    'etiktak.products',
+    'etiktak.model.clients',
+    'etiktak.model.supermarkets',
+    'etiktak.model.products',
 )
 
 # A sample logging configuration. The only tangible logging

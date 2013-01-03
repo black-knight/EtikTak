@@ -23,32 +23,16 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from etiktak.service import user_service
-from etiktak.util import util
+from etiktak.model.supermarkets import models as supermarkets
 
-from piston.handler import BaseHandler
+from django.contrib import admin
+from django_google_maps import widgets as map_widgets
+from django_google_maps import fields as map_fields
 
-class ApplyUserHandler(BaseHandler):
-    allowed_methods = ('GET',)
+class SupermarketLocationAdmin(admin.ModelAdmin):
+    formfield_overrides = {
+            map_fields.AddressField: {'widget': map_widgets.GoogleMapsAddressWidget},
+    }
 
-    def read(self, request, mobile_number=None, password=None):
-        try:
-            mobile_number = util.getRequiredParam(request, 'mobile_number')
-            password = util.getRequiredParam(request, 'password')
-            user_service.apply_for_user(mobile_number, password)
-            return {"result": "OK"}
-        except Exception as e:
-            return {"result": e}
-
-class VerifyUserHandler(BaseHandler):
-    allowed_methods = ('GET',)
-
-    def read(self, request, mobile_number=None, password=None, challenge=None):
-        try:
-            mobile_number = util.getRequiredParam(request, 'mobile_number')
-            password = util.getRequiredParam(request, 'password')
-            challenge = util.getRequiredParam(request, 'challenge')
-            user_service.verify_user(mobile_number, password, challenge)
-            return {"result": "OK"}
-        except Exception as e:
-            return {"result": e}
+admin.site.register(supermarkets.Supermarket)
+admin.site.register(supermarkets.SupermarketLocation, SupermarketLocationAdmin)

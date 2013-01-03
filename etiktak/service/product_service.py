@@ -25,11 +25,11 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from etiktak.clients.models import Client
-from etiktak.products.models import *
+from etiktak.model.clients import models as clients
+from etiktak.model.products import models as products
 
 def create_product_location(mobile_number, password, barcode, barcode_type, geo_location):
-    client = Client.objects.get(mobile_number, password)
-    product = Product.objects.get(barcode=barcode, barcode_type=barcode_type)
-    ProductLocation.create_product_location(product, geo_location, client)
+    client = clients.Client.objects.get(mobile_number, password)
+    product = products.Product.objects.get(barcode=barcode, barcode_type=barcode_type)
+    products.ProductLocation.create_product_location(product, geo_location, client)
     print "Created product location for mobile number: %s and barcode: %s (%s)\n" % (mobile_number, barcode, barcode_type)

@@ -23,16 +23,18 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from etiktak.supermarkets.models import *
+from etiktak.api.user_handlers import *
+from etiktak.api.product_handlers import *
 
-from django.contrib import admin
-from django_google_maps import widgets as map_widgets
-from django_google_maps import fields as map_fields
+from django.conf.urls import *
+from piston.resource import Resource
 
-class SupermarketLocationAdmin(admin.ModelAdmin):
-    formfield_overrides = {
-            map_fields.AddressField: {'widget': map_widgets.GoogleMapsAddressWidget},
-    }
+create_user_handler = Resource(ApplyUserHandler)
+verify_user_handler = Resource(VerifyUserHandler)
+create_product_location_handler = Resource(CreateProductLocationHandler)
 
-admin.site.register(Supermarket)
-admin.site.register(SupermarketLocation, SupermarketLocationAdmin)
+urlpatterns = patterns('',
+    url(r'^users/apply/$', create_user_handler, { 'emitter_format' : 'json' }),
+    url(r'^users/verify/$', verify_user_handler, { 'emitter_format' : 'json' }),
+    url(r'^products/scan_location/$', create_product_location_handler, { 'emitter_format' : 'json' }),
+)

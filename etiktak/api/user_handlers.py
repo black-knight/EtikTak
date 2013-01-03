@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 # Copyright (c) 2012, Daniel Andersen (dani_ande@yahoo.dk)
 # All rights reserved.
 #
@@ -25,8 +23,32 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from etiktak.model.clients import models as clients
+from etiktak.util import util
+from etiktak.service import user_service
 
-def generate_challenge(mobile_number):
-    clients.SmsVerification.create_challenge(mobile_number)
-    print "Generated challenge for mobile number: %s\n" % mobile_number
+from piston.handler import BaseHandler
+
+class ApplyUserHandler(BaseHandler):
+    allowed_methods = ('GET',)
+
+    def read(self, request, mobile_number=None, password=None):
+        try:
+            mobile_number = util.getRequiredParam(request, 'mobile_number')
+            password = util.getRequiredParam(request, 'password')
+            user_service.apply_for_user(mobile_number, password)
+            return {"result": "OK"}
+        except Exception as e:
+            return {"result": e}
+
+class VerifyUserHandler(BaseHandler):
+    allowed_methods = ('GET',)
+
+    def read(self, request, mobile_number=None, password=None, challenge=None):
+        try:
+            mobile_number = util.getRequiredParam(request, 'mobile_number')
+            password = util.getRequiredParam(request, 'password')
+            challenge = util.getRequiredParam(request, 'challenge')
+            user_service.verify_user(mobile_number, password, challenge)
+            return {"result": "OK"}
+        except Exception as e:
+            return {"result": e}

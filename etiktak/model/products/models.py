@@ -25,13 +25,12 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from etiktak.supermarkets import models as supermarkets
-from etiktak.clients import models as clients
-
 from etiktak.util import util
+from etiktak.model.clients import models as clients
+from etiktak.model.supermarkets import models as supermarkets
 
-from django_google_maps import fields as map_fields
 from django.db import models
+from django_google_maps import fields as map_fields
 
 BARCODE_TYPE = util.enum(
     EAN13="EAN13",

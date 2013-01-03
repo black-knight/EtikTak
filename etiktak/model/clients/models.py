@@ -81,7 +81,8 @@ class SmsVerificationManager(models.Manager):
         verification = verifications[0]
         if not verification.challenge_hash == util.sha256(challenge):
             raise BaseException("Provided challenge for mobile number %s doesn't match" % mobile_number)
-        clients = Client.objects.filter(mobile_number_hash_password_hash_hashed=util.sha256(util.sha256(mobile_number) + util.sha256(password)))
+        clients = Client.objects.filter(mobile_number_hash_password_hash_hashed=util.sha256(
+            util.sha256(mobile_number) + util.sha256(password)))
         if clients is None or not len(clients) == 1:
             raise BaseException("No client found for mobile number: %s" % mobile_number)
         client = clients[0]
