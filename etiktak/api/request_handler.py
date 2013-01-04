@@ -23,3 +23,30 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+from piston import handler as piston
+from django.db import transaction
+
+class RequestHandler(piston.BaseHandler):
+    allowed_methods = ('GET',)
+
+    @transaction.commit_manually
+    def read(self, request, *args, **kwargs):
+        try:
+            result = self.get(request, *args, **kwargs)
+            transaction.commit()
+            return self.ok(result)
+        except BaseException as e:
+            transaction.rollback()
+            return self.error(e)
+
+    def get(self, request, *args, **kwargs):
+        raise NotImplementedError("Method not implemented")
+
+    def ok(self, result=None):
+        if result is None:
+            return {"result": "OK"}
+        else:
+            return result
+
+    def error(self, text=''):
+        return {"result": "FAILURE", "description": text}

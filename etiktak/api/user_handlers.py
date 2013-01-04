@@ -24,25 +24,12 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from etiktak.service import user_service
+from etiktak.api.request_handler import RequestHandler
 
-from piston.handler import BaseHandler
+class ApplyUserHandler(RequestHandler):
+    def get(self, request, mobile_number=None, password=None):
+        user_service.apply_for_user(mobile_number, password)
 
-class ApplyUserHandler(BaseHandler):
-    allowed_methods = ('GET',)
-
-    def read(self, request, mobile_number=None, password=None):
-        try:
-            user_service.apply_for_user(mobile_number, password)
-            return {"result": "OK"}
-        except Exception as e:
-            return {"result": e}
-
-class VerifyUserHandler(BaseHandler):
-    allowed_methods = ('GET',)
-
-    def read(self, request, mobile_number=None, password=None, challenge=None):
-        try:
-            user_service.verify_user(mobile_number, password, challenge)
-            return {"result": "OK"}
-        except Exception as e:
-            return {"result": e}
+class VerifyUserHandler(RequestHandler):
+    def get(self, request, mobile_number=None, password=None, challenge=None):
+        user_service.verify_user(mobile_number, password, challenge)
