@@ -128,7 +128,13 @@ WSGI_APPLICATION = 'EtikTakProject.wsgi.application'
 
 TEMPLATE_DIRS = ('templates',)
 
-INSTALLED_APPS = (
+MY_APPS = (
+    'etiktak.model.clients',
+    'etiktak.model.supermarkets',
+    'etiktak.model.products',
+)
+
+INSTALLED_APPS = MY_APPS + (
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -141,10 +147,6 @@ INSTALLED_APPS = (
     'lettuce.django',
     'django.contrib.admin',
     # 'django.contrib.admindocs',
-    'etiktak.util',
-    'etiktak.model.clients',
-    'etiktak.model.supermarkets',
-    'etiktak.model.products',
 )
 
 # A sample logging configuration. The only tangible logging
