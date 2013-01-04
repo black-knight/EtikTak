@@ -27,10 +27,23 @@ from piston import handler as piston
 from django.db import transaction
 
 class RequestHandler(piston.BaseHandler):
+    """
+    An abstract transactional request handler inheriting from piston.handler.BaseHandler.
+
+    Transactions are handled automatically and rollback hence performed if an error
+    occurs.
+
+    Moreover, if an exception is raised an error object along with its description will be
+    returned (in the given request format). If there is no result given from the request
+    method an OK result will be returned; else the result is directly returned.
+    """
     allowed_methods = ('GET',)
 
     @transaction.commit_manually
     def read(self, request, *args, **kwargs):
+        """
+        Handles incoming request. Wraps self.get-method in transaction/error handling.
+        """
         try:
             result = self.get(request, *args, **kwargs)
             transaction.commit()
@@ -40,13 +53,23 @@ class RequestHandler(piston.BaseHandler):
             return self.error(e)
 
     def get(self, request, *args, **kwargs):
+        """
+        Abstract method to implement. Is called by self.read and is thus wrapped in
+        transaction/error handling.
+        """
         raise NotImplementedError("Method not implemented")
 
     def ok(self, result=None):
+        """
+        Returns the given result, if any, or else a generic OK result.
+        """
         if result is None:
             return {"result": "OK"}
         else:
             return result
 
     def error(self, text=''):
+        """
+        Returns an error with the given error description.
+        """
         return {"result": "FAILURE", "description": text}
