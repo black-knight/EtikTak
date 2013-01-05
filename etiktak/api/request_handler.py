@@ -26,6 +26,12 @@
 from piston import handler as piston
 from django.db import transaction
 
+class ApiResult:
+    RESULT_KEY = "result"
+    DESCRIPTION_KEY = "description"
+    RESULT_OK = "OK"
+    RESULT_FAILURE = "FAILURE"
+
 class RequestHandler(piston.BaseHandler):
     """
     An abstract transactional request handler inheriting from piston.handler.BaseHandler.
@@ -50,7 +56,7 @@ class RequestHandler(piston.BaseHandler):
             return self.ok(result)
         except BaseException as e:
             transaction.rollback()
-            return self.error(e)
+            return self.error(e.message)
 
     def get(self, request, *args, **kwargs):
         """
@@ -64,7 +70,7 @@ class RequestHandler(piston.BaseHandler):
         Returns the given result, if any, or else a generic OK result.
         """
         if result is None:
-            return {"result": "OK"}
+            return {ApiResult.RESULT_KEY: ApiResult.RESULT_OK}
         else:
             return result
 
@@ -72,4 +78,5 @@ class RequestHandler(piston.BaseHandler):
         """
         Returns an error with the given error description.
         """
-        return {"result": "FAILURE", "description": text}
+        return {ApiResult.RESULT_KEY: ApiResult.RESULT_FAILURE,
+                ApiResult.DESCRIPTION_KEY: text}

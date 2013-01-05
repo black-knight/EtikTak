@@ -30,6 +30,8 @@ from lettuce.django import django_url
 from lettuce import world
 from django.test.client import Client
 
+from etiktak.api.request_handler import ApiResult
+
 APPLY_USER_URL = "users/apply"
 VERIFY_USER_URL = "users/verify"
 CREATE_PRODUCT_LOCATION_URL = "products/scan_location"
@@ -61,18 +63,18 @@ def call(url, params=None):
 def apply_for_user(mobile_number, password):
     call(APPLY_USER_URL, [mobile_number, password])
     result = json.loads(world.response.content)
-    verify_json_result(result, "OK")
+    verify_json_result(result, ApiResult.RESULT_OK)
     return result
 
 
 def verify_user(mobile_number, password, challenge):
     call(VERIFY_USER_URL, [mobile_number, password, challenge])
     result = json.loads(world.response.content)
-    verify_json_result(result, "OK")
+    verify_json_result(result, ApiResult.RESULT_OK)
     return result
 
 def create_product_location(mobile_number, password, barcode, barcode_type, geo_location):
     call(CREATE_PRODUCT_LOCATION_URL, [mobile_number, password, barcode, barcode_type, geo_location])
     result = json.loads(world.response.content)
-    verify_json_result(result, "OK")
+    verify_json_result(result, ApiResult.RESULT_OK)
     return result
