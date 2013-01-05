@@ -26,6 +26,8 @@
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+
 ADMINS = (
     ('dnla', 'dnla@webfactional.com'),
 )
@@ -143,6 +145,7 @@ INSTALLED_APPS = MY_APPS + (
     'django.contrib.staticfiles',
     'django_extensions',
     'django_google_maps',
+    'django_nose',
     'piston',
     'lettuce.django',
     'django.contrib.admin',
