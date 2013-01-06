@@ -23,6 +23,8 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import traceback
+
 from piston import handler as piston
 from django.db import transaction
 
@@ -56,6 +58,7 @@ class RequestHandler(piston.BaseHandler):
             return self.ok(result)
         except BaseException as e:
             transaction.rollback()
+            traceback.print_exc()
             return self.error(e.message)
 
     def get(self, request, *args, **kwargs):

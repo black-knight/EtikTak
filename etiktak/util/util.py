@@ -32,11 +32,11 @@ def sha256(s):
 def getRequiredParam(request, param):
     value = request.GET.get(param)
     if value is None:
-        raise ValueError("Missing parameter '%s'" % param)
+        raise ValueError("Missing request parameter: %s'" % param)
     return value
 
 def generate_challenge():
-    return uuid.uuid4().hex
+    return uuid.uuid4().hex # TODO! Secure challenge!
 
 def enum(**enums):
     return type('Enum', (), enums)

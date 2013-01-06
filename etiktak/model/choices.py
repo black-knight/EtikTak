@@ -25,16 +25,34 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from etiktak.model.clients import models as clients
+import inspect
 
-def generate_challenge(mobile_number):
-    clients.SmsVerification.create_challenge(mobile_number)
-    print "Generated challenge for mobile number: %s\n" % mobile_number
+class Choice(object):
+    """
+    A class that turns field members into a list of tuples for use in Django models choices.
 
-def update_sms_status(mobile_number, sms_handle, status):
-    print "Updating SMS: %s -> %s\n" % (mobile_number, status)
-    clients.SmsVerification.objects.update_sms_status(
-        mobile_number,
-        sms_handle,
-        clients.SMS_STATUSES.CPSMS_status_to_enum(status)
-    )
+    Examples:
+    >>> class UserLevels(Choice):
+        USER = (u'USER', u'User')
+        MODERATOR = (u'MODERATOR')
+        ADMIN = (u'ADMIN', u'God')
+    >>> list(UserLevels)
+    [(u'ADMIN', u'God'), (u'MODERATOR', u'MODERATOR'), (u'USER', u'User')]
+    >>> UserLevels.ADMIN
+    u'ADMIN'
+    """
+    class __metaclass__(type):
+        def __init__(cls, name, type, other):
+            cls._data = []
+            for name, value in inspect.getmembers(cls):
+                if not name.startswith("_") and not inspect.isfunction(value):
+                    if isinstance(value,tuple) and len(value) > 1:
+                        data = value
+                    else:
+                        data = (value, " ".join([x.capitalize() for x in name.split("_")]),)
+                    cls._data.append(data)
+                    setattr(cls, name, data[0])
+
+        def __iter__(cls):
+            for value, data in cls._data:
+                yield value, data

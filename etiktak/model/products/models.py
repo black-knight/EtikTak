@@ -25,16 +25,16 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from etiktak.util import util
+from etiktak.model import choices
 from etiktak.model.clients import models as clients
 from etiktak.model.supermarkets import models as supermarkets
 
 from django.db import models
 from django_google_maps import fields as map_fields
 
-BARCODE_TYPE = util.enum(
-    EAN13="EAN13",
-    UPC="UPC")
+class BARCODE_TYPES(choices.Choice):
+    EAN13=(u'EAN13', u'EAN13')
+    UPC=(u'UPC', u'UPC')
 
 class ProductCategory(models.Model):
     category = models.CharField(max_length=255, unique=True)
@@ -61,7 +61,7 @@ class ProductCategory(models.Model):
 class Product(models.Model):
     name = models.CharField(max_length=255)
     barcode = models.CharField(max_length=100, unique=True)
-    barcode_type = models.CharField(max_length=64)
+    barcode_type = models.CharField(max_length=64, choices=BARCODE_TYPES)
     category = models.ForeignKey(ProductCategory)
     created_timestamp = models.DateTimeField(auto_now_add=True)
     updated_timestamp = models.DateTimeField(auto_now=True)

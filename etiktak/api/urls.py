@@ -25,6 +25,7 @@
 
 from etiktak.api.user_handlers import *
 from etiktak.api.product_handlers import *
+from etiktak.api.sms_handlers import *
 
 from django.conf.urls import *
 from piston.resource import Resource
@@ -32,9 +33,11 @@ from piston.resource import Resource
 create_user_handler = Resource(ApplyUserHandler)
 verify_user_handler = Resource(VerifyUserHandler)
 create_product_location_handler = Resource(CreateProductLocationHandler)
+sms_callback_handler = Resource(SmsCallbackHandler)
 
 urlpatterns = patterns('',
     url(r'^users/apply/(?P<mobile_number>[^/]+)/(?P<password>[^/]+)/$', create_user_handler, { 'emitter_format' : 'json' }),
     url(r'^users/verify/(?P<mobile_number>[^/]+)/(?P<password>[^/]+)/(?P<challenge>[^/]+)/$', verify_user_handler, { 'emitter_format' : 'json' }),
     url(r'^products/scan_location/(?P<mobile_number>[^/]+)/(?P<password>[^/]+)/(?P<barcode>[^/]+)/(?P<barcode_type>[^/]+)/(?P<geo_location>[^/]+)/$', create_product_location_handler, { 'emitter_format' : 'json' }),
+    url(r'^sms/callback/$', sms_callback_handler, { 'emitter_format' : 'json' }),
 )

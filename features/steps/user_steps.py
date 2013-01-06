@@ -25,16 +25,26 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from etiktak.model.clients import models as clients
+from features import api_handler
 
-def generate_challenge(mobile_number):
-    clients.SmsVerification.create_challenge(mobile_number)
-    print "Generated challenge for mobile number: %s\n" % mobile_number
+from lettuce import step
+from lettuce import world
 
-def update_sms_status(mobile_number, sms_handle, status):
-    print "Updating SMS: %s -> %s\n" % (mobile_number, status)
-    clients.SmsVerification.objects.update_sms_status(
-        mobile_number,
-        sms_handle,
-        clients.SMS_STATUSES.CPSMS_status_to_enum(status)
-    )
+@step(u'Given I apply for a new user with mobile number "([^"]*)" and password "([^"]*)"')
+def given_i_apply_for_a_new_user_with_mobile_number_group1_and_password_group2(step, group1, group2):
+    world.mobile_number = group1
+    world.password = group2
+    api_handler.apply_for_user(world.mobile_number, world.password)
+
+@step(u'Given there is already a user with mobile number "([^"]*)"')
+def given_there_is_already_a_user_with_mobile_number_group1(step, group1):
+    world.mobile_number = group1
+    api_handler.apply_for_user(world.mobile_number, "test1234")
+
+@step(u'Then I cannot apply for a new user with that mobile number')
+def then_i_cannot_apply_for_a_new_user_with_that_mobile_number(step):
+    try:
+        api_handler.apply_for_user(world.mobile_number, "not_test1234")
+    except BaseException:
+        return
+    raise BaseException("I was able to apply from mobile phone number already used: %s" % world.mobile_number)

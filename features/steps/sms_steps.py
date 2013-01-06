@@ -25,16 +25,12 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+from features import api_handler
 from etiktak.model.clients import models as clients
 
-def generate_challenge(mobile_number):
-    clients.SmsVerification.create_challenge(mobile_number)
-    print "Generated challenge for mobile number: %s\n" % mobile_number
+from lettuce import step
+from lettuce import world
 
-def update_sms_status(mobile_number, sms_handle, status):
-    print "Updating SMS: %s -> %s\n" % (mobile_number, status)
-    clients.SmsVerification.objects.update_sms_status(
-        mobile_number,
-        sms_handle,
-        clients.SMS_STATUSES.CPSMS_status_to_enum(status)
-    )
+@step(u'And I simulate that an SMS has been successfully sent')
+def and_i_simulate_that_an_sms_has_been_successfully_sent(step):
+    api_handler.simulate_SMS_sent(world.mobile_number, clients.SmsVerification.objects.get(world.mobile_number).sms_handle)

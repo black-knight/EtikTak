@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 # Copyright (c) 2012, Daniel Andersen (dani_ande@yahoo.dk)
 # All rights reserved.
 #
@@ -25,16 +23,13 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from etiktak.model.clients import models as clients
+from etiktak.service import sms_service
+from etiktak.api.request_handler import RequestHandler
+from etiktak.util import util
 
-def generate_challenge(mobile_number):
-    clients.SmsVerification.create_challenge(mobile_number)
-    print "Generated challenge for mobile number: %s\n" % mobile_number
-
-def update_sms_status(mobile_number, sms_handle, status):
-    print "Updating SMS: %s -> %s\n" % (mobile_number, status)
-    clients.SmsVerification.objects.update_sms_status(
-        mobile_number,
-        sms_handle,
-        clients.SMS_STATUSES.CPSMS_status_to_enum(status)
-    )
+class SmsCallbackHandler(RequestHandler):
+    def get(self, request, sms_handle=None, status=None, receiver=None):
+        sms_handle = util.getRequiredParam(request, 'sms_handle')
+        status = util.getRequiredParam(request, 'status')
+        receiver = util.getRequiredParam(request, 'receiver')
+        sms_service.update_sms_status(mobile_number=receiver, sms_handle=sms_handle, status=status)
