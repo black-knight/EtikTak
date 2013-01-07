@@ -26,17 +26,15 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import uuid
-import base64
-import M2Crypto
 
+from etiktak.util import security
 from etiktak.model import choices
-from etiktak.util import util
 
 from django.db import models
 
 class ClientManager(models.Manager):
     def get(self, mobile_number, password):
-        clients = self.filter(mobile_number_hash_password_hash_hashed=util.sha256(util.sha256(mobile_number) + util.sha256(password)))
+        clients = self.filter(mobile_number_hash_password_hash_hashed=security.Client.mobileNumberHashPasswordHashHashed(mobile_number, password))
         if clients is None or not len(clients) == 1:
             raise BaseException("No unique client found for mobile number: %s" % mobile_number)
         return clients[0]
@@ -64,7 +62,7 @@ class Client(models.Model):
         """
         client_key = Client(
             uid=uuid.uuid4(),
-            mobile_number_hash_password_hash_hashed=util.sha256(util.sha256(mobile_number) + util.sha256(password)))
+            mobile_number_hash_password_hash_hashed=security.Client.mobileNumberHashPasswordHashHashed(mobile_number, password))
         client_key.save()
         return client_key
 
@@ -96,7 +94,7 @@ class SMS_STATUSES(choices.Choice):
 
 class SmsVerificationManager(models.Manager):
     def get(self, mobile_number):
-        verifications = self.filter(mobile_number_hash=util.sha256(mobile_number))
+        verifications = self.filter(mobile_number_hash=security.hash(mobile_number))
         if verifications is None or not len(verifications) == 1:
             raise BaseException("No unique challenge found for mobile number: %s" % mobile_number)
         return verifications[0]
@@ -117,7 +115,7 @@ class SmsVerificationManager(models.Manager):
         verification.save()
 
     def assert_valid_challenge(self, sms_verification, mobile_number, challenge):
-        if not sms_verification.challenge_hash == util.sha256(challenge):
+        if not sms_verification.challenge_hash == security.hash(challenge):
             raise BaseException("Provided challenge for mobile number %s doesn't match" % mobile_number)
 
     def assert_valid_verification_state(self, sms_verification, mobile_number):
@@ -149,16 +147,16 @@ class SmsVerification(models.Model):
         """
         SmsVerification.assert_challenge_not_already_exists(mobile_number)
         sms_verification = SmsVerification(
-            challenge_hash = util.sha256(util.generate_challenge()),
+            challenge_hash = security.hash(security.SMS.generate_sms_challenge()),
             status=SMS_STATUSES.PENDING,
-            mobile_number_hash = util.sha256(mobile_number),
-            sms_handle = base64.b64encode(M2Crypto.m2.rand_bytes(16)))
+            mobile_number_hash = security.hash(mobile_number),
+            sms_handle = security.SMS.generate_sms_handle())
         sms_verification.save()
         return sms_verification
 
     @staticmethod
     def assert_challenge_not_already_exists(mobile_number):
-        verifications = SmsVerification.objects.filter(mobile_number_hash=util.sha256(mobile_number))
+        verifications = SmsVerification.objects.filter(mobile_number_hash=security.hash(mobile_number))
         if not verifications is None and not len(verifications) == 0:
             raise BaseException("Challenge already exists for mobile number %s", mobile_number)
 
@@ -173,7 +171,7 @@ class SmsVerification(models.Model):
 
 class MobileNumberManager(models.Manager):
     def exists(self, mobile_number):
-        return self.filter(mobile_number_hash = util.sha256(mobile_number)).exists()
+        return self.filter(mobile_number_hash = security.hash(mobile_number)).exists()
 
 class MobileNumber(models.Model):
     mobile_number_hash = models.CharField(max_length=255, unique=True) # EncryptedCharField(max_length=255)
@@ -189,7 +187,7 @@ class MobileNumber(models.Model):
         """
         if MobileNumber.objects.exists(mobile_number):
             raise ValueError("Mobile number %s already exists" % mobile_number)
-        m = MobileNumber(mobile_number_hash = util.sha256(mobile_number))
+        m = MobileNumber(mobile_number_hash = security.hash(mobile_number))
         m.save()
         return m
 

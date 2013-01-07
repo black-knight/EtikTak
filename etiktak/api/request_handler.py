@@ -58,6 +58,7 @@ class RequestHandler(piston.BaseHandler):
             return self.ok(result)
         except BaseException as e:
             transaction.rollback()
+            print e
             traceback.print_exc()
             return self.error(e.message)
 

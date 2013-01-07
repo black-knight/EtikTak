@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 # Copyright (c) 2012, Daniel Andersen (dani_ande@yahoo.dk)
 # All rights reserved.
 #
@@ -25,30 +23,29 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from etiktak.util import security
-from etiktak.model.clients import models as clients
+import hashlib, random, os, base64, math
 
-from features import api_handler
+def hash(s):
+    return hashlib.sha256(s).hexdigest()
 
-from lettuce import step
-from lettuce import world
+def secure_random():
+    return random.SystemRandom()
 
-@step(u'Then I can verify the user')
-def then_i_can_verify_the_user(step):
-    api_handler.verify_user(world.mobile_number, world.password, world.challenge)
+class Client:
+    @staticmethod
+    def mobileNumberHashPasswordHashHashed(mobile_number, password):
+        return hash(hash(mobile_number) + hash(password))
 
-@step(u'Then I cannot verify the user with incorrect challenge')
-def then_i_cannot_verify_the_user_with_incorrect_challenge(step):
-    try:
-        api_handler.verify_user(world.mobile_number, world.password, "VERY UNLIKELY CHALLENGE")
-        raise BaseException("Was able to verify client with incorrect challenge")
-    except api_handler.WebserviceException:
-        pass
+class SMS:
+    SMS_HANDLE_BYTES = 16
+    SMS_CHALLENGE_DIGITS = 5
 
-@step(u'And I check that a challenge has been created in the database')
-def and_I_check_that_a_challenge_has_been_created_in_the_database(step):
-    verification = clients.SmsVerification.objects.get(world.mobile_number)
-    # Override challenge with custom challenge
-    world.challenge = security.SMS.generate_sms_challenge()
-    verification.challenge_hash = security.hash(world.challenge)
-    verification.save()
+    @classmethod
+    def generate_sms_challenge(cls):
+        MIN_VALUE = math.pow(10, cls.SMS_CHALLENGE_DIGITS - 1)
+        MAX_VALUE = (MIN_VALUE * 10) - 1
+        return str(secure_random().randint(MIN_VALUE, MAX_VALUE))
+
+    @classmethod
+    def generate_sms_handle(cls):
+        return base64.b64encode(os.urandom(cls.SMS_HANDLE_BYTES))

@@ -7,5 +7,3 @@ easy_install lettuce
 easy_install simplejson
 easy_install django_nose
 easy_install coverage
-easy_install M2Crypto
-

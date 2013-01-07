@@ -23,20 +23,11 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import hashlib
-import uuid
-
-def sha256(s):
-    return hashlib.sha256(s).hexdigest()
-
 def getRequiredParam(request, param):
     value = request.GET.get(param)
     if value is None:
         raise ValueError("Missing request parameter: %s'" % param)
     return value
-
-def generate_challenge():
-    return uuid.uuid4().hex # TODO! Secure challenge!
 
 def enum(**enums):
     return type('Enum', (), enums)
