@@ -24,6 +24,8 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import hashlib, random, os, base64, math
+import keyring, keyring.backend, getpass
+from util import cachedClassMethod
 
 def hash(s):
     return hashlib.sha256(s).hexdigest()
@@ -49,3 +51,45 @@ class SMS:
     @classmethod
     def generate_sms_handle(cls):
         return base64.b64encode(os.urandom(cls.SMS_HANDLE_BYTES))
+
+class EtikTakKeyring:
+    KEYRING_PASSWORD_FILENAME = "keyring.pass"
+    KEYRING_USERNAME = "etiktak"
+
+    keyring_password = None
+    password_cache = {}
+
+    @classmethod
+    def instantiate(cls):
+        keyring.set_keyring(keyring.backend.CryptedFileKeyring())
+        if cls.keyring_password is not None:
+            return
+        cls.load_keyring_password()
+        if cls.keyring_password is None:
+            cls.prompt_keyring_password()
+
+    @classmethod
+    @cachedClassMethod(dictionary=password_cache)
+    def get_password(cls, service_name):
+        return keyring.get_password(service_name, cls.KEYRING_USERNAME)
+
+    @classmethod
+    def load_keyring_password(cls):
+        try:
+            with open(cls.KEYRING_PASSWORD_FILENAME) as f:
+                cls.keyring_password = f.readline()
+        except:
+            pass
+
+    @classmethod
+    def prompt_keyring_password(cls):
+        cls.keyring_password = getpass.getpass("Enter keyring password: ")
+
+    @classmethod
+    def cached(cls, f):
+        def check_cache(key):
+            if key in cls.password_cache:
+                return cls.password_cache[key]
+            cls.password_cache[key] = f(key)
+            return cls.password_cache[key]
+        return check_cache

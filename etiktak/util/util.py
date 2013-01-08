@@ -30,3 +30,13 @@ def getRequiredParam(request, param):
 
 def enum(**enums):
     return type('Enum', (), enums)
+
+def cachedClassMethod(dictionary):
+    def cached_decorator(f):
+        def check_cache(cls, key):
+            if key in dictionary:
+                return dictionary[key]
+            dictionary[key] = f(cls, key)
+            return dictionary[key]
+        return check_cache
+    return cached_decorator
