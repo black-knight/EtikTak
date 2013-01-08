@@ -57,7 +57,7 @@ def parse_url(url, params = None):
             url += urllib2.quote(param) + "/"
         return url
 
-def call(url, params=None, skip_parse_url=False):
+def call(url, params=None):
     try:
         url = parse_url(url, params)
         world.client = Client()

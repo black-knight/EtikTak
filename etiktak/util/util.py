@@ -25,8 +25,7 @@
 
 def getRequiredParam(request, param):
     value = request.GET.get(param)
-    if value is None:
-        raise ValueError("Missing request parameter: %s'" % param)
+    assert value is not None, "Missing request parameter: %s'" % param
     return value
 
 def enum(**enums):

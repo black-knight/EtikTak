@@ -42,8 +42,7 @@ def main():
     password = getpass.getpass("Password: ")
     verify_password = getpass.getpass("Password (again): ")
 
-    if not password == verify_password:
-        raise ValueError("Passwords not same")
+    assert password == verify_password
 
     keyring.set_password(service_name, username, password)
 

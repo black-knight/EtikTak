@@ -98,8 +98,7 @@ class ProductLocation(models.Model):
         location and client and with created timestamp (=scanned timestamp) set to now.
         If client is not verified an exception is raised.
         """
-        if not client.verified:
-            raise BaseException("Client attempted to contribute though not verified")
+        assert client.verified, "Client attempted to contribute though not verified"
         location = ProductLocation(product=product, scanned_location=scanned_location, client=client)
         location.save()
         return location

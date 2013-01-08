@@ -35,8 +35,7 @@ from django.db import models
 class ClientManager(models.Manager):
     def get(self, mobile_number, password):
         clients = self.filter(mobile_number_hash_password_hash_hashed=security.Client.mobileNumberHashPasswordHashHashed(mobile_number, password))
-        if clients is None or not len(clients) == 1:
-            raise BaseException("No unique client found for mobile number: %s" % mobile_number)
+        assert clients is not None and len(clients) == 1, "No unique client found for mobile number: %s" % mobile_number
         return clients[0]
 
     def verify(self, mobile_number, password):
@@ -87,48 +86,32 @@ class SMS_STATUSES(choices.Choice):
                       "2": SMS_STATUSES.FAILED,
                       "4": SMS_STATUSES.PENDING,
                       "8": SMS_STATUSES.FAILED}
-        if not CPSMS_status in status_map:
-            raise ValueError("Invalid SMS status: %s" % CPSMS_status)
-        else:
-            return status_map.get(CPSMS_status)
+        assert CPSMS_status in status_map, "Invalid SMS status: %s" % CPSMS_status
+        return status_map.get(CPSMS_status)
 
 class SmsVerificationManager(models.Manager):
     def get(self, mobile_number):
         verifications = self.filter(mobile_number_hash=security.hash(mobile_number))
-        if verifications is None or not len(verifications) == 1:
-            raise BaseException("No unique challenge found for mobile number: %s" % mobile_number)
+        assert verifications is not None and len(verifications) == 1, "No unique challenge found for mobile number: %s" % mobile_number
         return verifications[0]
 
     def verify_user(self, mobile_number, password, challenge):
         verification = self.get(mobile_number)
-        self.assert_valid_verification_state(verification, mobile_number)
-        self.assert_valid_challenge(verification, mobile_number, challenge)
+        assert verification.status == SMS_STATUSES.SENT, "Provided challenge for mobile number %s in invalid state: %s" % (mobile_number, verification.status)
+        print security.hash(challenge)
+        print verification.challenge_hash
+        print
+        assert verification.challenge_hash == security.hash(challenge), "Provided challenge for mobile number %s doesn't match" % mobile_number
         verification.status = SMS_STATUSES.VERIFIED
         verification.save()
         Client.objects.verify(mobile_number, password)
 
     def update_sms_status(self, mobile_number, sms_handle, status):
         verification = self.get(mobile_number)
-        self.assert_valid_sms_handle(verification, sms_handle, mobile_number)
-        self.assert_valid_update_status(verification, status)
+        assert verification.sms_handle == sms_handle, "Provided SMS handle (%s) for mobile number %s doesn't match actual handle: %s" % (sms_handle, mobile_number, verification.sms_handle)
+        assert verification.status == SMS_STATUSES.PENDING, "Cannot update SMS verification with status %s due to wrong state: %s" % (status, verification.status)
         verification.status = status
         verification.save()
-
-    def assert_valid_challenge(self, sms_verification, mobile_number, challenge):
-        if not sms_verification.challenge_hash == security.hash(challenge):
-            raise BaseException("Provided challenge for mobile number %s doesn't match" % mobile_number)
-
-    def assert_valid_verification_state(self, sms_verification, mobile_number):
-        if not sms_verification.status == SMS_STATUSES.SENT:
-            raise BaseException("Provided challenge for mobile number %s in invalid state: %s" % (mobile_number, sms_verification.status))
-
-    def assert_valid_sms_handle(self, sms_verification, sms_handle, mobile_number):
-        if not sms_verification.sms_handle == sms_handle:
-            raise BaseException("Provided SMS handle (%s) for mobile number %s doesn't match actual handle: %s" % (sms_handle, mobile_number, sms_verification.sms_handle))
-
-    def assert_valid_update_status(self, sms_verification, status):
-        if not sms_verification.status == SMS_STATUSES.PENDING:
-            raise BaseException("Cannot update SMS verification with status %s due to wrong state: %s" % (status, sms_verification.status))
 
 class SmsVerification(models.Model):
     mobile_number_hash = models.CharField(max_length=255, unique=True) # EncryptedCharField(max_length=255)
@@ -157,8 +140,7 @@ class SmsVerification(models.Model):
     @staticmethod
     def assert_challenge_not_already_exists(mobile_number):
         verifications = SmsVerification.objects.filter(mobile_number_hash=security.hash(mobile_number))
-        if not verifications is None and not len(verifications) == 0:
-            raise BaseException("Challenge already exists for mobile number %s", mobile_number)
+        assert verifications is None or len(verifications) == 0, "Challenge already exists for mobile number %s" % mobile_number
 
     def __unicode__(self):
         return u"%s | %s" % (self.challenge_hash, self.mobile_number_hash)
@@ -185,8 +167,7 @@ class MobileNumber(models.Model):
         """
         Creates and saves the hash of the specified mobile number.
         """
-        if MobileNumber.objects.exists(mobile_number):
-            raise ValueError("Mobile number %s already exists" % mobile_number)
+        assert not MobileNumber.objects.exists(mobile_number), "Mobile number %s already exists" % mobile_number
         m = MobileNumber(mobile_number_hash = security.hash(mobile_number))
         m.save()
         return m
