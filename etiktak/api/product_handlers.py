@@ -27,5 +27,5 @@ from etiktak.service import product_service
 from etiktak.api.request_handler import RequestHandler
 
 class CreateProductLocationHandler(RequestHandler):
-    def get(self, request, mobile_number=None, password=None, barcode=None, barcode_type=None, geo_location=None):
-        product_service.create_product_location(mobile_number, password, barcode, barcode_type, geo_location)
+    def get(self, request, mobile_number=None, uid=None, barcode=None, barcode_type=None, geo_location=None):
+        product_service.create_product_location(mobile_number, uid, barcode, barcode_type, geo_location)

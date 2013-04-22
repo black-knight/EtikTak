@@ -35,12 +35,18 @@ from lettuce import world
 
 @step(u'Then I can verify the user')
 def then_i_can_verify_the_user(step):
-    api_handler.verify_user(world.mobile_number, world.password, world.challenge)
+    if world.password is not None:
+        api_handler.verify_user_with_password(world.mobile_number, world.password, world.challenge)
+    else:
+        api_handler.verify_user_with_uid(world.mobile_number, world.uid, world.challenge)
 
 @step(u'Then I cannot verify the user with incorrect challenge')
 def then_i_cannot_verify_the_user_with_incorrect_challenge(step):
     try:
-        api_handler.verify_user(world.mobile_number, world.password, "VERY UNLIKELY CHALLENGE")
+        if world.password is not None:
+            api_handler.verify_user_with_password(world.mobile_number, world.password, "VERY UNLIKELY CHALLENGE")
+        else:
+            api_handler.verify_user_with_uid(world.mobile_number, world.client_uid, "VERY UNLIKELY CHALLENGE")
         raise BaseException("Was able to verify client with incorrect challenge")
     except api_handler.WebserviceException:
         pass

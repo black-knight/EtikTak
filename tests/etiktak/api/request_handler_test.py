@@ -36,13 +36,13 @@ class RequestHandlerTest(unittest.TestCase):
         (TEST_MOBILE_NUMBER, TEST_PASSWORD) = ("12345678", "test1234")
         result = RollbackTransactionTestHandler().read(None, mobile_number=TEST_MOBILE_NUMBER, password=TEST_PASSWORD)
         self.assertEquals(ApiResult.RESULT_FAILURE, result.get(ApiResult.RESULT_KEY), msg="Expected error from webservice")
-        self.assertRaises(BaseException, clients.Client.objects.get, TEST_MOBILE_NUMBER, TEST_PASSWORD)
+        self.assertRaises(BaseException, clients.Client.objects.get_by_password, TEST_MOBILE_NUMBER, TEST_PASSWORD)
 
     def will_commit_transaction_on_success_test(self):
         (TEST_MOBILE_NUMBER, TEST_PASSWORD) = ("13243546", "test1234")
         client = CommitTransactionTestHandler().read(None, mobile_number=TEST_MOBILE_NUMBER, password=TEST_PASSWORD)
         self.assertIsInstance(client, clients.Client, "Expected client datatype from webservice")
-        self.assertEqual(client, clients.Client.objects.get(TEST_MOBILE_NUMBER, TEST_PASSWORD))
+        self.assertEqual(client, clients.Client.objects.get_by_password(TEST_MOBILE_NUMBER, TEST_PASSWORD))
 
     def will_return_OK_when_no_result_supplied_test(self):
         result = NoResultTestHandler().read(None, None, None)

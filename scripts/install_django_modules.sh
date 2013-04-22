@@ -1,5 +1,8 @@
 #!/usr/bin/bash
 
+# Misc
+easy_install django-extensions
+
 # Webservice
 easy_install django-piston
 easy_install httplib2
