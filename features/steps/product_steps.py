@@ -26,6 +26,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from etiktak.model.products import models as products
+from etiktak.model.clients import models as clients
 
 from features import api_handler
 
@@ -42,6 +43,8 @@ def and_i_can_contribute_to_crowd_database_on_an_existing_product(step):
 @step(u'Then I cannot contribute to the crowd database on an existing product')
 def then_i_cannot_contribute_to_the_crowd_database_on_an_existing_product(step):
     product = create_random_product()
+    if world.client_uid is None:
+        world.client_uid = clients.Client.objects.get_by_password(world.mobile_number, world.password)
     try:
         api_handler.create_product_location(world.mobile_number, world.password, world.client_uid, product.barcode, products.BARCODE_TYPES.EAN13, "1.0, 2.0")
         raise BaseException("Was able to contribute even though not verified")

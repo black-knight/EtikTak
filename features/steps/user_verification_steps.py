@@ -35,15 +35,20 @@ from lettuce import world
 
 @step(u'Then I can verify the user')
 def then_i_can_verify_the_user(step):
-    world.client_uid = api_handler.verify_user(world.mobile_number, world.password, world.challenge)
-    print "UID: "
-    print world.client_uid
-    print "\n"
+    world.client_uid = api_handler.verify_user(world.mobile_number, world.password, world.sms_challenge, world.client_challenge)
 
-@step(u'Then I cannot verify the user with incorrect challenge')
+@step(u'Then I cannot verify the user with incorrect SMS challenge')
 def then_i_cannot_verify_the_user_with_incorrect_challenge(step):
     try:
-        api_handler.verify_user(world.mobile_number, world.password, "VERY UNLIKELY CHALLENGE")
+        api_handler.verify_user(world.mobile_number, world.password, "VERY UNLIKELY CHALLENGE", world.client_challenge)
+        raise BaseException("Was able to verify client with incorrect challenge")
+    except api_handler.WebserviceException:
+        pass
+
+@step(u'Then I cannot verify the user with incorrect client challenge')
+def then_i_cannot_verify_the_user_with_incorrect_challenge(step):
+    try:
+        api_handler.verify_user(world.mobile_number, world.password, world.sms_challenge, "VERY UNLIKELY CHALLENGE")
         raise BaseException("Was able to verify client with incorrect challenge")
     except api_handler.WebserviceException:
         pass
@@ -52,6 +57,6 @@ def then_i_cannot_verify_the_user_with_incorrect_challenge(step):
 def and_I_check_that_a_challenge_has_been_created_in_the_database(step):
     verification = clients.SmsVerification.objects.get(world.mobile_number)
     # Override challenge with custom challenge
-    world.challenge = security.SMS.generate_sms_challenge()
-    verification.challenge_hash = security.hash(world.challenge)
+    world.sms_challenge = security.SMS.generate_sms_challenge()
+    verification.sms_challenge_hash = security.hash(world.sms_challenge)
     verification.save()

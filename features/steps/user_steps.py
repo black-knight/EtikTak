@@ -34,12 +34,15 @@ from lettuce import world
 def given_i_apply_for_a_new_user_with_mobile_number_group1_and_password_group2(step, group1, group2):
     world.mobile_number = group1
     world.password = group2
-    api_handler.apply_for_user(world.mobile_number, world.password)
+    world.client_uid = None
+    world.client_challenge = api_handler.apply_for_user(world.mobile_number, world.password)
 
 @step(u'Given there is already a user with mobile number "([^"]*)"')
 def given_there_is_already_a_user_with_mobile_number_group1(step, group1):
     world.mobile_number = group1
-    api_handler.apply_for_user(world.mobile_number, "test1234")
+    world.password = "test1234"
+    world.client_uid = None
+    world.client_challenge = api_handler.apply_for_user(world.mobile_number, world.password)
 
 @step(u'Then I cannot apply for a new user with that mobile number')
 def then_i_cannot_apply_for_a_new_user_with_that_mobile_number(step):

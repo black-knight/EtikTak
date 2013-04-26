@@ -28,8 +28,8 @@ from etiktak.api.request_handler import RequestHandler
 
 class ApplyUserHandler(RequestHandler):
     def get(self, request, mobile_number=None, password=None):
-        user_service.apply_for_use(mobile_number, password)
+        return user_service.apply_for_user(mobile_number, password)
 
 class VerifyUserHandler(RequestHandler):
-    def get(self, request, mobile_number=None, password=None, challenge=None):
-        return user_service.verify_user(mobile_number, password, challenge)
+    def get(self, request, mobile_number=None, password=None, sms_challenge=None, client_challenge=None):
+        return user_service.verify_user(mobile_number, password, sms_challenge, client_challenge)

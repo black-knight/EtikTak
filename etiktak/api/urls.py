@@ -37,7 +37,7 @@ sms_callback_handler = Resource(SmsCallbackHandler)
 
 urlpatterns = patterns('',
     url(r'^users/apply/(?P<mobile_number>[^/]+)/(?P<password>[^/]+)/$', create_user_handler, { 'emitter_format' : 'json' }),
-    url(r'^users/verify/(?P<mobile_number>[^/]+)/(?P<password>[^/]+)/(?P<challenge>[^/]+)/$', verify_user_handler, { 'emitter_format' : 'json' }),
+    url(r'^users/verify/(?P<mobile_number>[^/]+)/(?P<password>[^/]+)/(?P<sms_challenge>[^/]+)/(?P<client_challenge>[^/]+)/$', verify_user_handler, { 'emitter_format' : 'json' }),
     url(r'^products/scan_location/(?P<mobile_number>[^/]+)/(?P<password>[^/]+)/(?P<uid>[^/]+)/(?P<barcode>[^/]+)/(?P<barcode_type>[^/]+)/(?P<geo_location>[^/]+)/$', create_product_location_handler, { 'emitter_format' : 'json' }),
     url(r'^sms/callback/$', sms_callback_handler, { 'emitter_format' : 'json' }),
 )

@@ -69,10 +69,10 @@ def apply_for_user(mobile_number, password):
     call(APPLY_USER, [mobile_number, password])
     result = json.loads(world.response.content)
     verify_json_result(result, ApiResult.RESULT_OK)
-    return result
+    return result["challenge"]
 
-def verify_user(mobile_number, password, challenge):
-    call(VERIFY_USER, [mobile_number, password, challenge])
+def verify_user(mobile_number, password, sms_challenge, client_challenge):
+    call(VERIFY_USER, [mobile_number, password, sms_challenge, client_challenge])
     result = json.loads(world.response.content)
     verify_json_result(result, ApiResult.RESULT_OK)
     return result["uid"]
