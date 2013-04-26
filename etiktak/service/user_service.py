@@ -30,7 +30,7 @@ from etiktak.service import sms_service
 
 def apply_for_user(mobile_number, password):
     clients.MobileNumber.create_mobile_number(mobile_number)
-    clients.Client.create_client_key_with_password(mobile_number, password)
+    clients.Client.create_client_key(mobile_number, password)
     sms_service.generate_challenge(mobile_number)
     print "User created: %s\n" % mobile_number
     sms_verification = clients.SmsVerification.objects.get(mobile_number)
