@@ -26,18 +26,10 @@
 from etiktak.service import user_service
 from etiktak.api.request_handler import RequestHandler
 
-class ApplyUserByPasswordHandler(RequestHandler):
+class ApplyUserHandler(RequestHandler):
     def get(self, request, mobile_number=None, password=None):
-        user_service.apply_for_user_with_password(mobile_number, password)
+        user_service.apply_for_use(mobile_number, password)
 
-class ApplyUserByUidHandler(RequestHandler):
-    def get(self, request, mobile_number=None, uid=None):
-        user_service.apply_for_user_with_uid(mobile_number, uid)
-
-class VerifyUserByPasswordHandler(RequestHandler):
+class VerifyUserHandler(RequestHandler):
     def get(self, request, mobile_number=None, password=None, challenge=None):
-        user_service.verify_user_with_password(mobile_number, password, challenge)
-
-class VerifyUserByUidHandler(RequestHandler):
-    def get(self, request, mobile_number=None, uid=None, challenge=None):
-        user_service.verify_user_with_uid(mobile_number, uid, challenge)
+        return user_service.verify_user(mobile_number, password, challenge)

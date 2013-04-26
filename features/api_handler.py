@@ -33,10 +33,8 @@ from django.test.client import Client
 
 from etiktak.api.request_handler import ApiResult
 
-APPLY_USER_WITH_PASSWORD_URL = "users/apply"
-APPLY_USER_WITH_UID_URL = "users/apply"
-VERIFY_USER_WITH_PASSWORD_URL = "users/verify"
-VERIFY_USER_WITH_UID_URL = "users/verify"
+APPLY_USER = "users/apply"
+VERIFY_USER = "users/verify"
 CREATE_PRODUCT_LOCATION_URL = "products/scan_location"
 SMS_CALLBACK_URL = "sms/callback"
 
@@ -67,32 +65,20 @@ def call(url, params=None):
     except BaseException as e:
         raise WebserviceException(e)
 
-def apply_for_user_with_password(mobile_number, password):
-    call(APPLY_USER_WITH_PASSWORD_URL, [mobile_number, password])
+def apply_for_user(mobile_number, password):
+    call(APPLY_USER, [mobile_number, password])
     result = json.loads(world.response.content)
     verify_json_result(result, ApiResult.RESULT_OK)
     return result
 
-def apply_for_user_with_uid(mobile_number, uid):
-    call(APPLY_USER_WITH_UID_URL, [mobile_number, uid])
+def verify_user(mobile_number, password, challenge):
+    call(VERIFY_USER, [mobile_number, password, challenge])
     result = json.loads(world.response.content)
     verify_json_result(result, ApiResult.RESULT_OK)
-    return result
+    return result["uid"]
 
-def verify_user_with_password(mobile_number, password, challenge):
-    call(VERIFY_USER_WITH_PASSWORD_URL, [mobile_number, password, challenge])
-    result = json.loads(world.response.content)
-    verify_json_result(result, ApiResult.RESULT_OK)
-    return result
-
-def verify_user_with_uid(mobile_number, uid, challenge):
-    call(VERIFY_USER_WITH_UID_URL, [mobile_number, uid, challenge])
-    result = json.loads(world.response.content)
-    verify_json_result(result, ApiResult.RESULT_OK)
-    return result
-
-def create_product_location(mobile_number, uid, barcode, barcode_type, geo_location):
-    call(CREATE_PRODUCT_LOCATION_URL, [mobile_number, uid, barcode, barcode_type, geo_location])
+def create_product_location(mobile_number, password, uid, barcode, barcode_type, geo_location):
+    call(CREATE_PRODUCT_LOCATION_URL, [mobile_number, password, uid, barcode, barcode_type, geo_location])
     result = json.loads(world.response.content)
     verify_json_result(result, ApiResult.RESULT_OK)
     return result

@@ -30,18 +30,14 @@ from etiktak.api.sms_handlers import *
 from django.conf.urls import *
 from piston.resource import Resource
 
-create_user_by_password_handler = Resource(ApplyUserByPasswordHandler)
-create_user_by_uid_handler = Resource(ApplyUserByUidHandler)
-verify_user_by_password_handler = Resource(VerifyUserByPasswordHandler)
-verify_user_by_uid_handler = Resource(VerifyUserByUidHandler)
+create_user_handler = Resource(ApplyUserHandler)
+verify_user_handler = Resource(VerifyUserHandler)
 create_product_location_handler = Resource(CreateProductLocationHandler)
 sms_callback_handler = Resource(SmsCallbackHandler)
 
 urlpatterns = patterns('',
-    url(r'^users/apply/(?P<mobile_number>[^/]+)/(?P<password>[^/]+)/$', create_user_by_password_handler, { 'emitter_format' : 'json' }),
-    url(r'^users/apply/(?P<mobile_number>[^/]+)/(?P<uid>[^/]+)/$', create_user_by_uid_handler, { 'emitter_format' : 'json' }),
-    url(r'^users/verify/(?P<mobile_number>[^/]+)/(?P<password>[^/]+)/(?P<challenge>[^/]+)/$', verify_user_by_password_handler, { 'emitter_format' : 'json' }),
-    url(r'^users/verify/(?P<mobile_number>[^/]+)/(?P<uid>[^/]+)/(?P<challenge>[^/]+)/$', verify_user_by_uid_handler, { 'emitter_format' : 'json' }),
-    url(r'^products/scan_location/(?P<mobile_number>[^/]+)/(?P<uid>[^/]+)/(?P<barcode>[^/]+)/(?P<barcode_type>[^/]+)/(?P<geo_location>[^/]+)/$', create_product_location_handler, { 'emitter_format' : 'json' }),
+    url(r'^users/apply/(?P<mobile_number>[^/]+)/(?P<password>[^/]+)/$', create_user_handler, { 'emitter_format' : 'json' }),
+    url(r'^users/verify/(?P<mobile_number>[^/]+)/(?P<password>[^/]+)/(?P<challenge>[^/]+)/$', verify_user_handler, { 'emitter_format' : 'json' }),
+    url(r'^products/scan_location/(?P<mobile_number>[^/]+)/(?P<password>[^/]+)/(?P<uid>[^/]+)/(?P<barcode>[^/]+)/(?P<barcode_type>[^/]+)/(?P<geo_location>[^/]+)/$', create_product_location_handler, { 'emitter_format' : 'json' }),
     url(r'^sms/callback/$', sms_callback_handler, { 'emitter_format' : 'json' }),
 )

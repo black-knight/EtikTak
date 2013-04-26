@@ -73,10 +73,13 @@ class RequestHandler(piston.BaseHandler):
         """
         Returns the given result, if any, or else a generic OK result.
         """
-        if result is None:
-            return {ApiResult.RESULT_KEY: ApiResult.RESULT_OK}
-        else:
-            return result
+        dict = {ApiResult.RESULT_KEY: ApiResult.RESULT_OK}
+        if result is not None:
+            dict.update(result)
+        print "------------"
+        print dict
+        print "------------"
+        return dict
 
     def error(self, text=''):
         """

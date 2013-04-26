@@ -28,8 +28,10 @@
 from etiktak.model.clients import models as clients
 from etiktak.model.products import models as products
 
-def create_product_location(mobile_number, uid, barcode, barcode_type, geo_location):
+def create_product_location(mobile_number, password, uid, barcode, barcode_type, geo_location):
+    client_by_password = clients.Client.objects.get_by_password(mobile_number, password)
     client = clients.Client.objects.get_by_uid(uid)
+    assert client_by_password.uid == client.uid, "Incorrect credentials provided"
     product = products.Product.objects.get(barcode=barcode, barcode_type=barcode_type)
     products.ProductLocation.create_product_location(product, geo_location, client)
     print "Created product location for mobile number: %s and barcode: %s (%s)\n" % (mobile_number, barcode, barcode_type)

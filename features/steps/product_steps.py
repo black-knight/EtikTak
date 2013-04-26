@@ -37,24 +37,24 @@ import random
 @step(u'And I can contribute to the crowd database on an existing product')
 def and_i_can_contribute_to_crowd_database_on_an_existing_product(step):
     product = create_random_product()
-    api_handler.create_product_location(world.mobile_number, world.uid, product.barcode, products.BARCODE_TYPES.EAN13, "1.0, 2.0")
+    api_handler.create_product_location(world.mobile_number, world.password, world.client_uid, product.barcode, products.BARCODE_TYPES.EAN13, "1.0, 2.0")
 
 @step(u'Then I cannot contribute to the crowd database on an existing product')
 def then_i_cannot_contribute_to_the_crowd_database_on_an_existing_product(step):
     product = create_random_product()
     try:
-        api_handler.create_product_location(world.mobile_number, world.uid, product.barcode, products.BARCODE_TYPES.EAN13, "1.0, 2.0")
+        api_handler.create_product_location(world.mobile_number, world.password, world.client_uid, product.barcode, products.BARCODE_TYPES.EAN13, "1.0, 2.0")
         raise BaseException("Was able to contribute even though not verified")
     except api_handler.WebserviceException:
         pass
 
 @step(u'I cannot contribute to the crowd database on an existing product with non-existant user')
 def i_cannot_contribute_to_the_crowd_database_on_an_existing_product_with_non_existant_user(step):
-    world.mobile_number="I_DONT_EXIST"
-    world.uid = "UID1234"
+    world.mobile_number = "I_DONT_EXIST"
+    world.client_uid = "UID_THAT_DOESNT_EXIST"
     product = create_random_product()
     try:
-        api_handler.create_product_location(world.mobile_number, world.uid, product.barcode, products.BARCODE_TYPES.EAN13, "1.0, 2.0")
+        api_handler.create_product_location(world.mobile_number, world.password, world.client_uid, product.barcode, products.BARCODE_TYPES.EAN13, "1.0, 2.0")
         raise BaseException("Was able to contribute even though I don't exist!")
     except api_handler.WebserviceException:
         pass

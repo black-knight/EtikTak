@@ -28,22 +28,20 @@
 from etiktak.model.clients import models as clients
 from etiktak.service import sms_service
 
-def apply_for_user_with_password(mobile_number, password):
+def apply_for_use(mobile_number, password):
     clients.MobileNumber.create_mobile_number(mobile_number)
     clients.Client.create_client_key_with_password(mobile_number, password)
     sms_service.generate_challenge(mobile_number)
     print "User created: %s\n" % mobile_number
 
-def apply_for_user_with_uid(mobile_number, uid):
+def apply_for_user_without_password(mobile_number, uid):
     clients.MobileNumber.create_mobile_number(mobile_number)
     clients.Client.create_client_key_with_uid(mobile_number, uid)
     sms_service.generate_challenge(mobile_number)
     print "User created: %s\n" % mobile_number
 
-def verify_user_with_password(mobile_number, password, challenge):
-    clients.SmsVerification.objects.verify_user_with_password(mobile_number, password, challenge)
+def verify_user(mobile_number, password, challenge):
+    uid = clients.SmsVerification.objects.verify_user(mobile_number, password, challenge)
     print "User verified: %s\n" % mobile_number
-
-def verify_user_with_uid(mobile_number, uid, challenge):
-    clients.SmsVerification.objects.verify_user_with_uid(mobile_number, uid, challenge)
-    print "User verified: %s\n" % mobile_number
+    client = clients.Client.objects.get_by_password(mobile_number, password)
+    return {"uid": client.uid}
