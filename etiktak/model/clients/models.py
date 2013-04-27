@@ -79,6 +79,12 @@ class Client(models.Model):
 
 
 
+# SMS verification entity keeps track of client verification. It consists of two parts; 1) the
+# actual SMS verification, which the user has to verify by receiving a SMS, and 2) a "hidden"
+# client challenge sent from the server to the client. Since the SMS verification challenge
+# is inheritedly weak a client challenge is used to strengthen security, thus forcing an
+# attacker to guess also a client challenge.
+
 class SMS_STATUSES(choices.Choice):
     PENDING = (u'PENDING', u'Pending (being sent)')
     SENT = (u'SENT', u'Delivered')
@@ -155,6 +161,10 @@ class SmsVerification(models.Model):
         verbose_name_plural = u"SMS verifikationer"
 
 
+
+# Used to keep track of which mobile numbers are in use. Since client entity knows nothing about
+# mobile number (without password) we need this entity. However, there is no direct relation between
+# a client and its mobile number.
 
 class MobileNumberManager(models.Manager):
     def exists(self, mobile_number):
