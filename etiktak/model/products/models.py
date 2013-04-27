@@ -83,23 +83,22 @@ class Product(models.Model):
         verbose_name = u"Produkt"
         verbose_name_plural = u"Produkter"
 
-class ProductLocation(models.Model):
+class ProductScan(models.Model):
     product = models.ForeignKey(Product)
-    supermarket_location = models.ForeignKey(supermarkets.SupermarketLocation, null=True, default=None)
     scanned_location = map_fields.GeoLocationField(max_length=100)
     client = models.ForeignKey(clients.Client)
     created_timestamp = models.DateTimeField(auto_now_add=True)
     updated_timestamp = models.DateTimeField(auto_now=True)
 
     @staticmethod
-    def create_product_location(product, scanned_location, client):
+    def create_product_scan(product, scanned_location, client):
         """
         Creates and saves a product location for the specified product, scanned
         location and client and with created timestamp (=scanned timestamp) set to now.
         If client is not verified an exception is raised.
         """
         assert client.verified, "Client attempted to contribute though not verified"
-        location = ProductLocation(product=product, scanned_location=scanned_location, client=client)
+        location = ProductScan(product=product, scanned_location=scanned_location, client=client)
         location.save()
         return location
 
@@ -107,5 +106,5 @@ class ProductLocation(models.Model):
         return u"%s | %s" % (self.supermarket_location, self.scanned_location)
 
     class Meta:
-        verbose_name = u"Produktlokation"
-        verbose_name_plural = u"Produktlokationer"
+        verbose_name = u"Produktscanning"
+        verbose_name_plural = u"Produktscanninger"
