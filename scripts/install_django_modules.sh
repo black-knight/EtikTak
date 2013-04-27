@@ -6,7 +6,7 @@ easy_install django-extensions
 # Webservice
 easy_install django-piston
 easy_install httplib2
-easy_install simplejson
+easy_install simplejson==1.9.3
 
 # Admin
 easy_install django_google_maps
