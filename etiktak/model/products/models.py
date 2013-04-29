@@ -87,35 +87,6 @@ class Product(models.Model):
 
 
 
-CLUSTER_ALG_STATUS = util.enum(NOT_VISITED=0, VISITED=1, NOISE=2)
-
-class ProductScanClusterStatus(models.Model):
-    clustering = models.BooleanField(default=False)
-
-class ProductScanCluster(models.Model):
-    product = models.ForeignKey(Product)
-    cluster_number = models.IntegerField()
-    cluster_alg_status = models.IntegerField()
-
-    @staticmethod
-    def create_product_scan_cluster(product):
-        """
-        Creates and saves a product scan location cluster with initial cluster set to
-        unknown.
-        """
-        scan = ProductScanCluster(product=product, cluster_alg_status=CLUSTER_ALG_STATUS.NOT_VISITED, cluster_number=-1)
-        scan.save()
-        return scan
-
-    def __unicode__(self):
-        return u"%s | %s" % (self.cluster_number, self.cluster_status)
-
-    class Meta:
-        verbose_name = u"Produktscanning"
-        verbose_name_plural = u"Produktscanninger"
-
-
-
 class ProductScan(models.Model):
     product = models.ForeignKey(Product)
     scanned_location = map_fields.GeoLocationField(max_length=100)
@@ -136,11 +107,40 @@ class ProductScan(models.Model):
         scan = ProductScan(product=product, client=client, scanned_location=scan_latitude + ", " + scan_longitude,
                            scan_latitude=scan_latitude, scan_longitude=scan_longitude)
         scan.save()
-        ProductScanCluster.create_product_scan_cluster(product=product)
+        ProductScanCluster.create_product_scan_cluster(product_scan=scan)
         return scan
 
     def __unicode__(self):
         return u"%s | %s" % (self.supermarket_location, self.scanned_location)
+
+    class Meta:
+        verbose_name = u"Produktscanning"
+        verbose_name_plural = u"Produktscanninger"
+
+
+
+CLUSTER_ALG_STATUS = util.enum(NOT_VISITED=0, VISITED=1, NOISE=2)
+
+class ProductScanClusterStatus(models.Model):
+    clustering = models.BooleanField(default=False)
+
+class ProductScanCluster(models.Model):
+    product_scan = models.ForeignKey(ProductScan)
+    cluster_number = models.IntegerField()
+    cluster_alg_status = models.IntegerField()
+
+    @staticmethod
+    def create_product_scan_cluster(product_scan):
+        """
+        Creates and saves a product scan location cluster with initial cluster set to
+        unknown.
+        """
+        scan = ProductScanCluster(product_scan=product_scan, cluster_alg_status=CLUSTER_ALG_STATUS.NOT_VISITED, cluster_number=-1)
+        scan.save()
+        return scan
+
+    def __unicode__(self):
+        return u"%s | %s" % (self.cluster_number, self.cluster_status)
 
     class Meta:
         verbose_name = u"Produktscanning"
