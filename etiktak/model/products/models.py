@@ -25,12 +25,12 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from etiktak.model import choices
-from etiktak.model.clients import models as clients
-from etiktak.util import util
-
 from django.db import models
 from django_google_maps import fields as map_fields
+
+from etiktak.model.clients import models as clients
+from etiktak.util import util, choices
+
 
 class BARCODE_TYPES(choices.Choice):
     EAN13=(u'EAN13', u'EAN13')
@@ -89,6 +89,9 @@ class Product(models.Model):
 
 CLUSTER_ALG_STATUS = util.enum(NOT_VISITED=0, VISITED=1, NOISE=2)
 
+class ProductScanClusterStatus(models.Model):
+    clustering = models.BooleanField(default=False)
+
 class ProductScanCluster(models.Model):
     product = models.ForeignKey(Product)
     cluster_number = models.IntegerField()
@@ -100,8 +103,7 @@ class ProductScanCluster(models.Model):
         Creates and saves a product scan location cluster with initial cluster set to
         unknown.
         """
-        scan = ProductScanCluster(product=product, cluster_number=-1,
-                                  cluster_alg_status=CLUSTER_ALG_STATUS.NOT_VISITED)
+        scan = ProductScanCluster(product=product, cluster_alg_status=CLUSTER_ALG_STATUS.NOT_VISITED, cluster_number=-1)
         scan.save()
         return scan
 

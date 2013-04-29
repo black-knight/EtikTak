@@ -27,10 +27,9 @@
 
 import uuid
 
-from etiktak.util import security
-from etiktak.model import choices
-
 from django.db import models
+
+from etiktak.util import security, choices
 
 class ClientManager(models.Manager):
     def get_by_password(self, mobile_number, password):
