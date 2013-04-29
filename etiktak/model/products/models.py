@@ -27,7 +27,7 @@
 
 from etiktak.model import choices
 from etiktak.model.clients import models as clients
-from etiktak.model.supermarkets import models as supermarkets
+from etiktak.util import util
 
 from django.db import models
 from django_google_maps import fields as map_fields
@@ -58,6 +58,8 @@ class ProductCategory(models.Model):
         verbose_name = u"Produktkategori"
         verbose_name_plural = u"Produktkategorier"
 
+
+
 class Product(models.Model):
     name = models.CharField(max_length=255)
     barcode = models.CharField(max_length=100, unique=True)
@@ -83,24 +85,57 @@ class Product(models.Model):
         verbose_name = u"Produkt"
         verbose_name_plural = u"Produkter"
 
+
+
+CLUSTER_ALG_STATUS = util.enum(NOT_VISITED=0, VISITED=1, NOISE=2)
+
+class ProductScanCluster(models.Model):
+    product = models.ForeignKey(Product)
+    cluster_number = models.IntegerField()
+    cluster_alg_status = models.IntegerField()
+
+    @staticmethod
+    def create_product_scan_cluster(product):
+        """
+        Creates and saves a product scan location cluster with initial cluster set to
+        unknown.
+        """
+        scan = ProductScanCluster(product=product, cluster_number=-1,
+                                  cluster_alg_status=CLUSTER_ALG_STATUS.NOT_VISITED)
+        scan.save()
+        return scan
+
+    def __unicode__(self):
+        return u"%s | %s" % (self.cluster_number, self.cluster_status)
+
+    class Meta:
+        verbose_name = u"Produktscanning"
+        verbose_name_plural = u"Produktscanninger"
+
+
+
 class ProductScan(models.Model):
     product = models.ForeignKey(Product)
     scanned_location = map_fields.GeoLocationField(max_length=100)
+    scan_longitude = models.FloatField()
+    scan_latitude = models.FloatField()
     client = models.ForeignKey(clients.Client)
     created_timestamp = models.DateTimeField(auto_now_add=True)
     updated_timestamp = models.DateTimeField(auto_now=True)
 
     @staticmethod
-    def create_product_scan(product, scanned_location, client):
+    def create_product_scan(product, client, scan_latitude, scan_longitude):
         """
-        Creates and saves a product location for the specified product, scanned
+        Creates and saves a product scan location for the specified product, scanned
         location and client and with created timestamp (=scanned timestamp) set to now.
         If client is not verified an exception is raised.
         """
         assert client.verified, "Client attempted to contribute though not verified"
-        location = ProductScan(product=product, scanned_location=scanned_location, client=client)
-        location.save()
-        return location
+        scan = ProductScan(product=product, client=client, scanned_location=scan_latitude + ", " + scan_longitude,
+                           scan_latitude=scan_latitude, scan_longitude=scan_longitude)
+        scan.save()
+        ProductScanCluster.create_product_scan_cluster(product=product)
+        return scan
 
     def __unicode__(self):
         return u"%s | %s" % (self.supermarket_location, self.scanned_location)

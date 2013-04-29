@@ -35,7 +35,7 @@ from etiktak.api.request_handler import ApiResult
 
 APPLY_USER = "users/apply"
 VERIFY_USER = "users/verify"
-CREATE_PRODUCT_SCAN_URL = "products/scan_product"
+CREATE_PRODUCT_SCAN_URL = "products/scan"
 SMS_CALLBACK_URL = "sms/callback"
 
 class WebserviceException(BaseException):
@@ -77,8 +77,8 @@ def verify_user(mobile_number, password, sms_challenge, client_challenge):
     verify_json_result(result, ApiResult.RESULT_OK)
     return result["uid"]
 
-def create_product_scan(mobile_number, password, uid, barcode, barcode_type, geo_location):
-    call(CREATE_PRODUCT_SCAN_URL, [mobile_number, password, uid, barcode, barcode_type, geo_location])
+def create_product_scan(mobile_number, password, uid, barcode, barcode_type, scan_latitude, scan_longitude):
+    call(CREATE_PRODUCT_SCAN_URL, [mobile_number, password, uid, barcode, barcode_type, scan_latitude, scan_longitude])
     result = json.loads(world.response.content)
     verify_json_result(result, ApiResult.RESULT_OK)
     return result

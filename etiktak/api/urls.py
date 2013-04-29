@@ -32,12 +32,12 @@ from piston.resource import Resource
 
 create_user_handler = Resource(ApplyUserHandler)
 verify_user_handler = Resource(VerifyUserHandler)
-create_product_scan_handler = Resource(ScanProductHandler)
+scan_product_handler = Resource(ScanProductHandler)
 sms_callback_handler = Resource(SmsCallbackHandler)
 
 urlpatterns = patterns('',
     url(r'^users/apply/(?P<mobile_number>[^/]+)/(?P<password>[^/]+)/$', create_user_handler, { 'emitter_format' : 'json' }),
     url(r'^users/verify/(?P<mobile_number>[^/]+)/(?P<password>[^/]+)/(?P<sms_challenge>[^/]+)/(?P<client_challenge>[^/]+)/$', verify_user_handler, { 'emitter_format' : 'json' }),
-    url(r'^products/scan_product/(?P<mobile_number>[^/]+)/(?P<password>[^/]+)/(?P<uid>[^/]+)/(?P<barcode>[^/]+)/(?P<barcode_type>[^/]+)/(?P<geo_location>[^/]+)/$', create_product_scan_handler, { 'emitter_format' : 'json' }),
+    url(r'^products/scan/(?P<mobile_number>[^/]+)/(?P<password>[^/]+)/(?P<uid>[^/]+)/(?P<barcode>[^/]+)/(?P<barcode_type>[^/]+)/(?P<scan_latitude>[^/]+)/(?P<scan_longitude>[^/]+)/$', scan_product_handler, { 'emitter_format' : 'json' }),
     url(r'^sms/callback/$', sms_callback_handler, { 'emitter_format' : 'json' }),
 )
