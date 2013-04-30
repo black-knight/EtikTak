@@ -29,28 +29,8 @@ from etiktak.model.products import models as products
 
 class Clustering:
     def start(self):
-        if self.is_clustering():
-            return
-        self.mark_clustering_started()
         print "Clustering started!\n"
-        self.mark_clustering_stopped()
+        node = self.emit_node()
 
-    def is_clustering(self):
-        return self.get_clustering_status().clustering
-
-    def mark_clustering_started(self):
-        status = self.get_clustering_status()
-        status.clustering = True
-        status.save()
-
-    def mark_clustering_stopped(self):
-        status = self.get_clustering_status()
-        status.clustering = False
-        status.save()
-
-    def get_clustering_status(self):
-        status = products.ProductScanClusterStatus.objects.all()
-        if status.count() == 0:
-            return products.ProductScanClusterStatus(clustering=False)
-        else:
-            return status[0]
+    def emit_node(self):
+        return products.ProductScanClusterNode.objects.get_next_node()

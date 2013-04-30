@@ -23,6 +23,8 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import math
+
 def getRequiredParam(request, param):
     value = request.GET.get(param)
     assert value is not None, "Missing request parameter: %s'" % param
@@ -40,3 +42,18 @@ def cachedClassMethod(dictionary):
             return dictionary[key]
         return check_cache
     return cached_decorator
+
+def meters_to_latitude(meters):
+    return meters / 111111.0
+
+def meters_to_longitude(meters, latitude):
+    return meters / (111111.0 * math.cos(latitude * math.pi / 180.0))
+
+def meters_to_aprox_longitude(meters):
+    return meters_to_longitude(meters, 56.0)
+
+def latitude_to_meters(latitude):
+    return latitude * 111111
+
+def longitude_to_meters(longitude, latitude):
+    return longitude * 111111 * math.cos(latitude * math.pi / 180.0)

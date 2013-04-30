@@ -25,6 +25,8 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import math
+
 from django.db import models
 from django_google_maps import fields as map_fields
 
@@ -90,8 +92,8 @@ class Product(models.Model):
 class ProductScan(models.Model):
     product = models.ForeignKey(Product)
     scanned_location = map_fields.GeoLocationField(max_length=100)
-    scan_longitude = models.FloatField()
     scan_latitude = models.FloatField()
+    scan_longitude = models.FloatField()
     client = models.ForeignKey(clients.Client)
     created_timestamp = models.DateTimeField(auto_now_add=True)
     updated_timestamp = models.DateTimeField(auto_now=True)
@@ -107,7 +109,7 @@ class ProductScan(models.Model):
         scan = ProductScan(product=product, client=client, scanned_location=scan_latitude + ", " + scan_longitude,
                            scan_latitude=scan_latitude, scan_longitude=scan_longitude)
         scan.save()
-        ProductScanCluster.create_product_scan_cluster(product_scan=scan)
+        ProductScanClusterNode.create_product_scan_cluster_node(product_scan=scan)
         return scan
 
     def __unicode__(self):
@@ -119,28 +121,66 @@ class ProductScan(models.Model):
 
 
 
-CLUSTER_ALG_STATUS = util.enum(NOT_VISITED=0, VISITED=1, NOISE=2)
+CLUSTER_NODE_STATUS = util.enum(NOT_VISITED=0, VISITED=1, BEING_PROCESSED=2, NOISE=3)
 
-class ProductScanClusterStatus(models.Model):
-    clustering = models.BooleanField(default=False)
+NEIGHBORHOOD_EPSILON = 15.0
+NEIGHBORHOOD_MIN_DENSITY = 3
 
-class ProductScanCluster(models.Model):
+class ProductScanClusterNodeManager(models.Manager):
+    def get_next_node(self):
+        nodes = self.filter(status=CLUSTER_NODE_STATUS.NOT_VISITED)
+        if nodes is None or len(nodes) == 0:
+            return None
+        node = nodes[0]
+        node.status = CLUSTER_NODE_STATUS.BEING_PROCESSED
+        node.save()
+        return node
+
+    def get_neighborhood_nodes(self, node):
+        nodes = self.filter(scan_latitude__ge=node.scan_latitude - NEIGHBORHOOD_EPSILON,
+                            scan_latitude__le=node.scan_latitude - NEIGHBORHOOD_EPSILON,
+                            scan_longitude__ge=node.scan_longitude - NEIGHBORHOOD_EPSILON,
+                            scan_longitude__le=node.scan_longitude - NEIGHBORHOOD_EPSILON)
+        if nodes is None or len(nodes) == 0:
+            return []
+        density_nodes = []
+        for n in nodes:
+            if self.squared_distance_in_meters(node, n) <= NEIGHBORHOOD_EPSILON*NEIGHBORHOOD_EPSILON:
+                density_nodes.append(n)
+                if n.status is CLUSTER_NODE_STATUS.NOT_VISITED:
+                    n.status = CLUSTER_NODE_STATUS.BEING_PROCESSED
+                    n.save()
+        return density_nodes
+
+    def squared_distance_in_meters(self, n1, n2):
+        latitude_delta_meters = util.latitude_to_meters(n1.scan_latitude) -\
+                                util.latitude_to_meters(n2.scan_latitude)
+        longitude_delta_meters = util.longitude_to_meters(n1.scan_longitude, n1.scan_latitude) -\
+                                 util.longitude_to_meters(n2.scan_longitude, n2.scan_latitude)
+        return latitude_delta_meters*latitude_delta_meters + longitude_delta_meters*longitude_delta_meters
+
+class ProductScanClusterNode(models.Model):
     product_scan = models.ForeignKey(ProductScan)
+    scan_latitude = models.FloatField()
+    scan_longitude = models.FloatField()
     cluster_number = models.IntegerField()
-    cluster_alg_status = models.IntegerField()
+    status = models.IntegerField()
+
+    objects = ProductScanClusterNodeManager()
 
     @staticmethod
-    def create_product_scan_cluster(product_scan):
+    def create_product_scan_cluster_node(product_scan):
         """
         Creates and saves a product scan location cluster with initial cluster set to
         unknown.
         """
-        scan = ProductScanCluster(product_scan=product_scan, cluster_alg_status=CLUSTER_ALG_STATUS.NOT_VISITED, cluster_number=-1)
+        scan = ProductScanClusterNode(product_scan=product_scan, status=CLUSTER_NODE_STATUS.NOT_VISITED, cluster_number=-1,
+                                      scan_latitude=product_scan.scan_latitude, scan_longitude=product_scan.scan_longitude)
         scan.save()
         return scan
 
     def __unicode__(self):
-        return u"%s | %s" % (self.cluster_number, self.cluster_status)
+        return u"%s | %s | (%s, %s)" % (self.cluster_number, self.status, self.scan_latitude, self.scan_longitude)
 
     class Meta:
         verbose_name = u"Produktscanning"

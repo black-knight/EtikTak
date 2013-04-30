@@ -34,4 +34,4 @@ def create_product_scan(mobile_number, password, uid, barcode, barcode_type, sca
     assert client_by_password.uid == client_by_uid.uid, "Incorrect credentials provided"
     product = products.Product.objects.get(barcode=barcode, barcode_type=barcode_type)
     products.ProductScan.create_product_scan(product, client_by_uid, scan_latitude, scan_longitude)
-    print "Created product location for mobile number: %s and barcode: %s (%s)\n" % (mobile_number, barcode, barcode_type)
+    print "Created product location for mobile number: %s, barcode: %s (%s) and coordinates (%s, %s)\n" % (mobile_number, barcode, barcode_type, scan_latitude, scan_longitude)
