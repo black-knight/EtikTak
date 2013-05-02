@@ -29,7 +29,7 @@ from etiktak.model.clients import models as clients
 
 def generate_challenge(mobile_number):
     clients.SmsVerification.create_challenge(mobile_number)
-    print "Generated challenge for mobile number: %s\n" % mobile_number
+    print "Generated challenge for mobile number: %s" % mobile_number
 
 def update_sms_status(mobile_number, sms_handle, status):
     clients.SmsVerification.objects.update_sms_status(

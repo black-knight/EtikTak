@@ -32,12 +32,12 @@ def apply_for_user(mobile_number, password):
     clients.MobileNumber.create_mobile_number(mobile_number)
     clients.Client.create_client_key(mobile_number, password)
     sms_service.generate_challenge(mobile_number)
-    print "User created: %s\n" % mobile_number
+    print "User created: %s" % mobile_number
     sms_verification = clients.SmsVerification.objects.get(mobile_number)
     return {"challenge": sms_verification.client_challenge}
 
 def verify_user(mobile_number, password, sms_challenge, client_challenge):
     clients.SmsVerification.objects.verify_user(mobile_number, password, sms_challenge, client_challenge)
-    print "User verified: %s\n" % mobile_number
+    print "User verified: %s" % mobile_number
     client = clients.Client.objects.get_by_password(mobile_number, password)
     return {"uid": client.uid}

@@ -121,36 +121,44 @@ class ProductScan(models.Model):
 
 
 
-CLUSTER_NODE_STATUS = util.enum(NOT_VISITED=0, VISITED=1, BEING_PROCESSED=2, NOISE=3)
+CLUSTER_NODE_STATUS = util.enum(NOT_VISITED=0, VISITED=1, NOISE=2)
 
 NEIGHBORHOOD_EPSILON = 15.0
 NEIGHBORHOOD_MIN_DENSITY = 3
 
 class ProductScanClusterNodeManager(models.Manager):
+    hacky_wacky_next_cluster_number = 0
     def get_next_node(self):
         nodes = self.filter(status=CLUSTER_NODE_STATUS.NOT_VISITED)
         if nodes is None or len(nodes) == 0:
             return None
         node = nodes[0]
-        node.status = CLUSTER_NODE_STATUS.BEING_PROCESSED
+        node.status = CLUSTER_NODE_STATUS.VISITED
         node.save()
         return node
 
     def get_neighborhood_nodes(self, node):
-        nodes = self.filter(scan_latitude__ge=node.scan_latitude - NEIGHBORHOOD_EPSILON,
-                            scan_latitude__le=node.scan_latitude - NEIGHBORHOOD_EPSILON,
-                            scan_longitude__ge=node.scan_longitude - NEIGHBORHOOD_EPSILON,
-                            scan_longitude__le=node.scan_longitude - NEIGHBORHOOD_EPSILON)
+        nodes = self.filter(scan_latitude__gt=node.scan_latitude - NEIGHBORHOOD_EPSILON,
+                            scan_latitude__lt=node.scan_latitude + NEIGHBORHOOD_EPSILON,
+                            scan_longitude__gt=node.scan_longitude - NEIGHBORHOOD_EPSILON,
+                            scan_longitude__lt=node.scan_longitude + NEIGHBORHOOD_EPSILON)
         if nodes is None or len(nodes) == 0:
             return []
         density_nodes = []
         for n in nodes:
-            if self.squared_distance_in_meters(node, n) <= NEIGHBORHOOD_EPSILON*NEIGHBORHOOD_EPSILON:
+            if self.squared_distance_in_meters(node, n) <= NEIGHBORHOOD_EPSILON*NEIGHBORHOOD_EPSILON and n.id is not node.id:
                 density_nodes.append(n)
                 if n.status is CLUSTER_NODE_STATUS.NOT_VISITED:
-                    n.status = CLUSTER_NODE_STATUS.BEING_PROCESSED
+                    n.status = CLUSTER_NODE_STATUS.VISITED
                     n.save()
         return density_nodes
+
+    def get_nodes_in_cluster(self, cluster_number):
+        return self.filter(cluster_number=cluster_number)
+
+    def get_next_cluster_number(self):
+        self.hacky_wacky_next_cluster_number += 1
+        return self.hacky_wacky_next_cluster_number
 
     def squared_distance_in_meters(self, n1, n2):
         latitude_delta_meters = util.latitude_to_meters(n1.scan_latitude) -\
@@ -159,12 +167,14 @@ class ProductScanClusterNodeManager(models.Manager):
                                  util.longitude_to_meters(n2.scan_longitude, n2.scan_latitude)
         return latitude_delta_meters*latitude_delta_meters + longitude_delta_meters*longitude_delta_meters
 
+
+
 class ProductScanClusterNode(models.Model):
     product_scan = models.ForeignKey(ProductScan)
-    scan_latitude = models.FloatField()
-    scan_longitude = models.FloatField()
-    cluster_number = models.IntegerField()
-    status = models.IntegerField()
+    scan_latitude = models.FloatField(db_index=True)
+    scan_longitude = models.FloatField(db_index=True)
+    cluster_number = models.IntegerField(db_index=True)
+    status = models.IntegerField(db_index=True)
 
     objects = ProductScanClusterNodeManager()
 
