@@ -46,7 +46,7 @@ def given_i_simulate_that_a_user_scans_group1_times_in_a_radius_of_group2_meters
     user_verification_steps.and_I_check_that_a_challenge_has_been_created_in_the_database(None)
     sms_steps.and_i_simulate_that_an_sms_has_been_successfully_sent(None)
     user_verification_steps.then_i_can_verify_the_user(None)
-    create_random_product_scans(latitude_center=56.08, longitude_center=10.11, radius=float(group1), count=int(group2))
+    create_random_product_scans(latitude_center=56.08, longitude_center=10.11, radius=float(group2), count=int(group1))
 
 @step(u'And I run the clustering algorithm')
 def and_i_run_the_clustering_algorithm(step):

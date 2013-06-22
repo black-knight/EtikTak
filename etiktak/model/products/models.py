@@ -25,8 +25,6 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import math
-
 from django.db import models
 from django_google_maps import fields as map_fields
 
@@ -127,30 +125,26 @@ NEIGHBORHOOD_EPSILON = 15.0
 NEIGHBORHOOD_MIN_DENSITY = 3
 
 class ProductScanClusterNodeManager(models.Manager):
-    hacky_wacky_next_cluster_number = 0
+    hacky_wacky_next_cluster_number = 0  # TODO!
+
     def get_next_node(self):
-        nodes = self.filter(status=CLUSTER_NODE_STATUS.NOT_VISITED)
+        nodes = self.filter(status=CLUSTER_NODE_STATUS.NOT_VISITED)[0:1]
         if nodes is None or len(nodes) == 0:
             return None
         node = nodes[0]
-        node.status = CLUSTER_NODE_STATUS.VISITED
-        node.save()
         return node
 
-    def get_neighborhood_nodes(self, node):
+    def get_neighborhood_nodes(self, node, max_nodes=10000000):
         nodes = self.filter(scan_latitude__gt=node.scan_latitude - NEIGHBORHOOD_EPSILON,
                             scan_latitude__lt=node.scan_latitude + NEIGHBORHOOD_EPSILON,
                             scan_longitude__gt=node.scan_longitude - NEIGHBORHOOD_EPSILON,
-                            scan_longitude__lt=node.scan_longitude + NEIGHBORHOOD_EPSILON)
+                            scan_longitude__lt=node.scan_longitude + NEIGHBORHOOD_EPSILON)[0:max_nodes]
         if nodes is None or len(nodes) == 0:
             return []
         density_nodes = []
         for n in nodes:
             if self.squared_distance_in_meters(node, n) <= NEIGHBORHOOD_EPSILON*NEIGHBORHOOD_EPSILON and n.id is not node.id:
                 density_nodes.append(n)
-                if n.status is CLUSTER_NODE_STATUS.NOT_VISITED:
-                    n.status = CLUSTER_NODE_STATUS.VISITED
-                    n.save()
         return density_nodes
 
     def get_nodes_in_cluster(self, cluster_number):
