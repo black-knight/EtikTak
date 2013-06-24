@@ -29,6 +29,7 @@ from django.db import models
 from django_google_maps import fields as map_fields
 
 from etiktak.model.clients import models as clients
+from etiktak.model.stores import models as stores
 from etiktak.util import util, choices
 
 
@@ -47,7 +48,7 @@ class ProductCategory(models.Model):
         Creates and saves a product category with the specified
         category text.
         """
-        product_category = ProductCategory(category = category)
+        product_category = ProductCategory(category=category)
         product_category.save()
         return product_category
 
@@ -89,6 +90,8 @@ class Product(models.Model):
 
 class ProductScan(models.Model):
     product = models.ForeignKey(Product)
+    store = models.ForeignKey(stores.StoreInstance, null=True)
+    store_verified = models.BooleanField(default=False)
     scanned_location = map_fields.GeoLocationField(max_length=100)
     scan_latitude = models.FloatField()
     scan_longitude = models.FloatField()
@@ -97,21 +100,23 @@ class ProductScan(models.Model):
     updated_timestamp = models.DateTimeField(auto_now=True)
 
     @staticmethod
-    def create_product_scan(product, client, scan_latitude, scan_longitude):
+    def create_product_scan(product=None, store=None, store_verified=False, scan_latitude=None, scan_longitude=None, client=None):
         """
         Creates and saves a product scan location for the specified product, scanned
         location and client and with created timestamp (=scanned timestamp) set to now.
         If client is not verified an exception is raised.
         """
         assert client.verified, "Client attempted to contribute though not verified"
-        scan = ProductScan(product=product, client=client, scanned_location=scan_latitude + ", " + scan_longitude,
+        scan = ProductScan(product=product, store=store, client=client,
+                           store_verified=store_verified,
+                           scanned_location=scan_latitude + ", " + scan_longitude,
                            scan_latitude=scan_latitude, scan_longitude=scan_longitude)
         scan.save()
         ProductScanClusterNode.create_product_scan_cluster_node(product_scan=scan)
         return scan
 
     def __unicode__(self):
-        return u"%s | %s" % (self.scanned_location)
+        return u"%s | %s | %s" % (self.product, self.store, self.scanned_location)
 
     class Meta:
         verbose_name = u"Produktscanning"
@@ -164,7 +169,7 @@ class ProductScanClusterNodeManager(models.Manager):
 
 
 class ProductScanClusterNode(models.Model):
-    product_scan = models.ForeignKey(ProductScan)
+    product_scan = models.ForeignKey(ProductScan, db_index=True)
     scan_latitude = models.FloatField(db_index=True)
     scan_longitude = models.FloatField(db_index=True)
     cluster_number = models.IntegerField(db_index=True)
