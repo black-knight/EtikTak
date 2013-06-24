@@ -26,6 +26,8 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from etiktak.model.products import models as products
+from etiktak.model.stores import models as stores
+
 
 class Clustering:
     def start(self):
@@ -34,6 +36,7 @@ class Clustering:
          and handled.
         """
         print "Clustering started!\n"
+        products.ProductScanClusterNode.objects.reset()
         while True:
             node = self.emit_node()
             if node is None:
@@ -51,17 +54,22 @@ class Clustering:
         Updates the clusters with a node. This is only done approximately; that is, when the
         full clustering algorithm has been run, the clusters might be updated.
         """
-        neighborhood = products.ProductScanClusterNode.objects.get_neighborhood_nodes(node=node, max_nodes=products.NEIGHBORHOOD_MIN_DENSITY)
-        if len(neighborhood) == 0:
-            self.handle_noise(node)
+        clustered_neighborhood = products.ProductScanClusterNode.objects.get_neighborhood_nodes_in_cluster(node=node, max_nodes=products.NEIGHBORHOOD_MIN_DENSITY)
+        if len(clustered_neighborhood) > 0:
+            self.approx_node_from_clustered_neighborhood(node, clustered_neighborhood)
         else:
-            self.approx_node_from_neighborhood(node, neighborhood)
+            neighborhood = products.ProductScanClusterNode.objects.get_neighborhood_nodes(node=node)
+            if len(neighborhood) < products.NEIGHBORHOOD_MIN_DENSITY:
+                self.handle_noise(node)
+            else:
+                self.approx_create_cluster(node, neighborhood)
+        self.approx_store(node)
         node.save()
 
-    def approx_node_from_neighborhood(self, node, neighborhood):
+    def approx_node_from_clustered_neighborhood(self, node, neighborhood):
         """
          Approximates a node's cluster based on its neighborhood. Any neighbor node that resides
-         within a cluster can be choosen as cluster neighbor.
+         within a cluster may be choosen as cluster neighbor.
         """
         for neighborhood_node in neighborhood:
             if neighborhood_node.cluster_number is not -1:
@@ -69,6 +77,26 @@ class Clustering:
                 node.cluster_number = neighborhood_node.cluster_number
                 return
         self.handle_noise(node)
+
+    def approx_create_cluster(self, node, neighborhood):
+        node.status = products.CLUSTER_NODE_STATUS.VISITED
+        node.cluster_number = products.ProductScanClusterNode.objects.get_next_cluster_number()
+        for neighborhood_node in neighborhood:
+            neighborhood_node.status = products.CLUSTER_NODE_STATUS.VISITED
+            neighborhood_node.cluster_number = node.cluster_number
+            neighborhood_node.save()
+
+    def approx_store(self, node):
+        if node.product_scan.store_instance is not None and node.product_scan.store_instance.store_verified is True:
+            return
+        store_verified_neighborhood = products.ProductScanClusterNode.objects.get_neighborhood_nodes_with_store_verified(node=node, max_nodes=1)
+        if len(store_verified_neighborhood) > 0:
+            node.product_scan.store_instance = store_verified_neighborhood[0].product_scan.store_instance
+            return
+        store_instance_neighborhood = stores.StoreInstance.objects.get_stores(node.scan_latitude, node.scan_longitude, products.NEIGHBORHOOD_EPSILON, max_nodes=1)
+        if len(store_instance_neighborhood) > 0:
+            node.product_scan.store_instance = store_instance_neighborhood[0]
+            return
 
     def handle_node(self, node):
         """
@@ -80,6 +108,7 @@ class Clustering:
             self.handle_noise(node)
         else:
             self.expand_cluster(node, neighborhood)
+        self.approx_store(node)
         node.save()
 
     def handle_noise(self, node):
@@ -146,3 +175,6 @@ class Clustering:
             if len(other_neighborhood) >= products.NEIGHBORHOOD_MIN_DENSITY:
                 assert node.status == other_node.status, "Expected density nodes to have same status as all of its neighbor density nodes (%i versus %i)" % (node.status, other_node.status)
                 assert node.cluster_number == other_node.cluster_number, "Expected density node to be in same cluster as all of its neighbor density nodes"
+
+
+clustering_instance = Clustering()

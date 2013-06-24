@@ -26,6 +26,7 @@
 from etiktak.service import product_service
 from etiktak.api.request_handler import RequestHandler
 
+
 class ScanProductHandler(RequestHandler):
     def get(self, request, mobile_number=None, password=None, uid=None, barcode=None, barcode_type=None, scan_latitude=None, scan_longitude=None):
         product_service.create_product_scan(mobile_number, password, uid, barcode, barcode_type, scan_latitude, scan_longitude)

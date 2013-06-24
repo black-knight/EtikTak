@@ -29,6 +29,9 @@ from django.db import models
 
 from django_google_maps import fields as map_fields
 
+from etiktak.util import util as util
+
+
 class Store(models.Model):
     name = models.CharField(max_length=255, unique=True)
     created_timestamp = models.DateTimeField(auto_now_add=True)
@@ -50,24 +53,57 @@ class Store(models.Model):
         verbose_name = u"Forretning"
         verbose_name_plural = u"Forretning"
 
+
+class StoreInstanceManager(models.Manager):
+    def get_stores(self, latitude, longitude, radius, max_nodes=10000000):
+        stores = self.filter(latitude__gt=latitude - radius,
+                             latitude__lt=latitude + radius,
+                             longitude__gt=longitude - radius,
+                             longitude__lt=longitude + radius)[0:max_nodes]
+        return self.filter_stores_by_radius(latitude, longitude, radius, stores)
+
+    def filter_stores_by_radius(self, latitude, longitude, radius, stores):
+        if stores is None or len(stores) == 0:
+            return []
+        radius_stores = []
+        for s in stores:
+            if self.squared_distance_in_meters(latitude, longitude, s) <= radius*radius:
+                radius_stores.append(s)
+        return radius_stores
+
+    def squared_distance_in_meters(self, latitude, longitude, store):
+        latitude_delta_meters = util.latitude_to_meters(latitude) -\
+                                util.latitude_to_meters(store.latitude)
+        longitude_delta_meters = util.longitude_to_meters(longitude, latitude) -\
+                                 util.longitude_to_meters(store.longitude, store.latitude)
+        return latitude_delta_meters*latitude_delta_meters + longitude_delta_meters*longitude_delta_meters
+
+
 class StoreInstance(models.Model):
     address = map_fields.AddressField(max_length=200)
-    geolocation = map_fields.GeoLocationField(max_length=100)
+    location = map_fields.GeoLocationField(max_length=100)
+    latitude = models.FloatField(db_index=True)
+    longitude = models.FloatField(db_index=True)
     store = models.ForeignKey(Store)
     created_timestamp = models.DateTimeField(auto_now_add=True)
     updated_timestamp = models.DateTimeField(auto_now=True)
 
+    objects = StoreInstanceManager()
+
     @staticmethod
-    def create_store_instance(address, geolocation, store):
+    def create_store_instance(address, latitude, longitude, store):
         """
         Creates and saves a specific instance of a store with the specified address and geolocation.
         """
-        location = StoreInstance(address=address, geolocation=geolocation, store=store)
+        location = StoreInstance(address=address,
+                                 # location=latitude + ", " + longitude,
+                                 latitude=latitude, longitude=longitude,
+                                 store=store)
         location.save()
         return location
 
     def __unicode__(self):
-        return u"%s | %s" % (self.address, self.geolocation)
+        return u"%s | %s | %s | %s" % (self.address, self.latitude, self.longitude, self.store)
 
     class Meta:
         verbose_name = u"Forretningsinstans"

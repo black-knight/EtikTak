@@ -27,16 +27,20 @@ import hashlib, random, os, base64, math
 import keyring, keyring.backend, getpass
 from util import cachedClassMethod
 
+
 def hash(s):
     return hashlib.sha256(s).hexdigest()
 
+
 def secure_random():
     return random.SystemRandom()
+
 
 class Client:
     @staticmethod
     def mobileNumberHashPasswordHashHashed(mobile_number, password):
         return hash(hash(mobile_number) + hash(password))
+
 
 class SMS:
     SMS_HANDLE_BYTES = 16
@@ -51,6 +55,7 @@ class SMS:
     @classmethod
     def generate_sms_handle(cls):
         return base64.b64encode(os.urandom(cls.SMS_HANDLE_BYTES))
+
 
 class EtikTakKeyring:
     KEYRING_PASSWORD_FILENAME = "keyring.pass"

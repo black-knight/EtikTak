@@ -36,6 +36,7 @@ from features.steps import product_steps
 from etiktak.util import clustering
 from etiktak.util import util
 from etiktak.model.products import models as products
+from etiktak.model.stores import models as stores
 
 from lettuce import step
 from lettuce import world
@@ -60,6 +61,8 @@ def then_the_product_scans_have_been_clustered_correctly(step):
 
 
 def create_random_product_scans(latitude_center, longitude_center, radius, count):
+    store = stores.Store.create_store("test_store_%f" % random.random())
+    stores.StoreInstance.create_store_instance("test_address_%f" % random.random(), latitude_center, longitude_center, store)
     product = product_steps.create_random_product()
     for i in range(1, count):
         latitude = latitude_center + (random.random() * util.meters_to_latitude(radius))

@@ -90,7 +90,7 @@ class Product(models.Model):
 
 class ProductScan(models.Model):
     product = models.ForeignKey(Product)
-    store = models.ForeignKey(stores.StoreInstance, null=True)
+    store_instance = models.ForeignKey(stores.StoreInstance, null=True)
     store_verified = models.BooleanField(default=False)
     scanned_location = map_fields.GeoLocationField(max_length=100)
     scan_latitude = models.FloatField()
@@ -100,14 +100,14 @@ class ProductScan(models.Model):
     updated_timestamp = models.DateTimeField(auto_now=True)
 
     @staticmethod
-    def create_product_scan(product=None, store=None, store_verified=False, scan_latitude=None, scan_longitude=None, client=None):
+    def create_product_scan(product=None, store_instance=None, store_verified=False, scan_latitude=None, scan_longitude=None, client=None):
         """
         Creates and saves a product scan location for the specified product, scanned
         location and client and with created timestamp (=scanned timestamp) set to now.
         If client is not verified an exception is raised.
         """
         assert client.verified, "Client attempted to contribute though not verified"
-        scan = ProductScan(product=product, store=store, client=client,
+        scan = ProductScan(product=product, store_instance=store_instance, client=client,
                            store_verified=store_verified,
                            scanned_location=scan_latitude + ", " + scan_longitude,
                            scan_latitude=scan_latitude, scan_longitude=scan_longitude)
@@ -116,7 +116,7 @@ class ProductScan(models.Model):
         return scan
 
     def __unicode__(self):
-        return u"%s | %s | %s" % (self.product, self.store, self.scanned_location)
+        return u"%s | %s | %s | %s" % (self.product, self.store_instance, self.store_verified, self.scanned_location)
 
     class Meta:
         verbose_name = u"Produktscanning"
@@ -126,11 +126,19 @@ class ProductScan(models.Model):
 
 CLUSTER_NODE_STATUS = util.enum(NOT_VISITED=0, VISITED=1, NOISE=2)
 
-NEIGHBORHOOD_EPSILON = 15.0
+NEIGHBORHOOD_EPSILON = 30.0
 NEIGHBORHOOD_MIN_DENSITY = 3
 
 class ProductScanClusterNodeManager(models.Manager):
     hacky_wacky_next_cluster_number = 0  # TODO!
+
+    def reset(self):
+        self.filter().update(cluster_number=-1, status=CLUSTER_NODE_STATUS.NOT_VISITED)
+
+    def get_by_scan(self, scan):
+        nodes = self.filter(product_scan=scan)
+        assert nodes is not None and len(nodes) == 1, "No unique cluster node found for scan: %s" % scan
+        return nodes[0]
 
     def get_next_node(self):
         nodes = self.filter(status=CLUSTER_NODE_STATUS.NOT_VISITED)[0:1]
@@ -144,6 +152,25 @@ class ProductScanClusterNodeManager(models.Manager):
                             scan_latitude__lt=node.scan_latitude + NEIGHBORHOOD_EPSILON,
                             scan_longitude__gt=node.scan_longitude - NEIGHBORHOOD_EPSILON,
                             scan_longitude__lt=node.scan_longitude + NEIGHBORHOOD_EPSILON)[0:max_nodes]
+        return self.filter_neighborhood_nodes(node, nodes)
+
+    def get_neighborhood_nodes_in_cluster(self, node, max_nodes=10000000):
+        nodes = self.filter(scan_latitude__gt=node.scan_latitude - NEIGHBORHOOD_EPSILON,
+                            scan_latitude__lt=node.scan_latitude + NEIGHBORHOOD_EPSILON,
+                            scan_longitude__gt=node.scan_longitude - NEIGHBORHOOD_EPSILON,
+                            scan_longitude__lt=node.scan_longitude + NEIGHBORHOOD_EPSILON,
+                            cluster_number__gt=-1)[0:max_nodes]
+        return self.filter_neighborhood_nodes(node, nodes)
+
+    def get_neighborhood_nodes_with_store_verified(self, node, max_nodes=10000000):
+        nodes = self.filter(scan_latitude__gt=node.scan_latitude - NEIGHBORHOOD_EPSILON,
+                            scan_latitude__lt=node.scan_latitude + NEIGHBORHOOD_EPSILON,
+                            scan_longitude__gt=node.scan_longitude - NEIGHBORHOOD_EPSILON,
+                            scan_longitude__lt=node.scan_longitude + NEIGHBORHOOD_EPSILON,
+                            product_scan__store_verified=True)[0:max_nodes]
+        return self.filter_neighborhood_nodes(node, nodes)
+
+    def filter_neighborhood_nodes(self, node, nodes):
         if nodes is None or len(nodes) == 0:
             return []
         density_nodes = []
@@ -165,7 +192,6 @@ class ProductScanClusterNodeManager(models.Manager):
         longitude_delta_meters = util.longitude_to_meters(n1.scan_longitude, n1.scan_latitude) -\
                                  util.longitude_to_meters(n2.scan_longitude, n2.scan_latitude)
         return latitude_delta_meters*latitude_delta_meters + longitude_delta_meters*longitude_delta_meters
-
 
 
 class ProductScanClusterNode(models.Model):

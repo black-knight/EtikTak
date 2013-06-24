@@ -27,10 +27,37 @@
 
 from etiktak.model.clients import models as clients
 from etiktak.model.products import models as products
+from etiktak.util.clustering import *
+
 
 def create_product_scan(mobile_number, password, uid, barcode, barcode_type, scan_latitude, scan_longitude):
     client_by_password = clients.Client.objects.get_by_password(mobile_number, password)
     client_by_uid = clients.Client.objects.get_by_uid(uid)
     assert client_by_password.uid == client_by_uid.uid, "Incorrect credentials provided"
     product = products.Product.objects.get(barcode=barcode, barcode_type=barcode_type)
-    products.ProductScan.create_product_scan(product=product, scan_latitude=scan_latitude, scan_longitude=scan_longitude, client=client_by_uid)
+    scan = products.ProductScan.create_product_scan(product=product, scan_latitude=scan_latitude, scan_longitude=scan_longitude, client=client_by_uid)
+    # print generate_feedback_from_scan(scan)
+    return generate_feedback_from_scan(scan)
+
+
+def generate_feedback_from_scan(scan):
+    node = products.ProductScanClusterNode.objects.get_by_scan(scan)
+    clustering_instance.approx_node(node)
+    return {"store_certainty": calculate_store_certainty(node),
+            "store": suggested_store(node)}
+
+
+def calculate_store_certainty(node):
+    if node.product_scan.store_instance is not None:
+        return 0.75
+    elif node.cluster_number is not -1:
+        return 0.5
+    else:
+        return 0
+
+
+def suggested_store(node):
+    if node.product_scan.store_instance is not None:
+        return node.product_scan.store_instance.store.name
+    else:
+        return ""
