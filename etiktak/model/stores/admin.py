@@ -23,7 +23,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from etiktak.model.supermarkets import models as supermarkets
+from etiktak.model.stores import models as supermarkets
 
 from django.contrib import admin
 from django_google_maps import widgets as map_widgets
@@ -34,5 +34,5 @@ class SupermarketLocationAdmin(admin.ModelAdmin):
             map_fields.AddressField: {'widget': map_widgets.GoogleMapsAddressWidget},
     }
 
-admin.site.register(supermarkets.Supermarket)
-admin.site.register(supermarkets.SupermarketLocation, SupermarketLocationAdmin)
+admin.site.register(supermarkets.Store)
+admin.site.register(supermarkets.StoreInstance, SupermarketLocationAdmin)

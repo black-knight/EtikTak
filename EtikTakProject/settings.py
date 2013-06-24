@@ -132,7 +132,7 @@ TEMPLATE_DIRS = ('templates',)
 
 MY_APPS = (
     'etiktak.model.clients',
-    'etiktak.model.supermarkets',
+    'etiktak.model.stores',
     'etiktak.model.products',
 )
 

@@ -29,7 +29,7 @@ from django.db import models
 
 from django_google_maps import fields as map_fields
 
-class Supermarket(models.Model):
+class Store(models.Model):
     name = models.CharField(max_length=255, unique=True)
     created_timestamp = models.DateTimeField(auto_now_add=True)
     updated_timestamp = models.DateTimeField(auto_now=True)
@@ -37,9 +37,9 @@ class Supermarket(models.Model):
     @staticmethod
     def create_supermarket(name):
         """
-        Creates and saves a supermarket with the specified name.
+        Creates and saves a store with the specified name.
         """
-        supermarket = Supermarket(name=name)
+        supermarket = Store(name=name)
         supermarket.save()
         return supermarket
 
@@ -47,23 +47,22 @@ class Supermarket(models.Model):
         return u"%s" % self.name
 
     class Meta:
-        verbose_name = u"Supermarked"
-        verbose_name_plural = u"Supermarkeder"
+        verbose_name = u"Forretning"
+        verbose_name_plural = u"Forretning"
 
-class SupermarketLocation(models.Model):
+class StoreInstance(models.Model):
     address = map_fields.AddressField(max_length=200)
     geolocation = map_fields.GeoLocationField(max_length=100)
-    supermarket = models.ForeignKey(Supermarket)
+    store = models.ForeignKey(Store)
     created_timestamp = models.DateTimeField(auto_now_add=True)
     updated_timestamp = models.DateTimeField(auto_now=True)
 
     @staticmethod
     def create_supermarket_location(address, geolocation, supermarket):
         """
-        Creates and saves a supermarket location with the specified address, geolocation and
-        supermarket.
+        Creates and saves a specific instance of a store with the specified address and geolocation.
         """
-        location = SupermarketLocation(address=address, geolocation=geolocation, supermarket=supermarket)
+        location = StoreInstance(address=address, geolocation=geolocation, supermarket=supermarket)
         location.save()
         return location
 
@@ -71,6 +70,6 @@ class SupermarketLocation(models.Model):
         return u"%s | %s" % (self.address, self.geolocation)
 
     class Meta:
-        verbose_name = u"Supermarkedslokation"
-        verbose_name_plural = u"Supermarkedslokationer"
+        verbose_name = u"Forretningsinstans"
+        verbose_name_plural = u"Forretningsinstanser"
 
