@@ -35,13 +35,13 @@ class Store(models.Model):
     updated_timestamp = models.DateTimeField(auto_now=True)
 
     @staticmethod
-    def create_supermarket(name):
+    def create_store(name):
         """
         Creates and saves a store with the specified name.
         """
-        supermarket = Store(name=name)
-        supermarket.save()
-        return supermarket
+        store = Store(name=name)
+        store.save()
+        return store
 
     def __unicode__(self):
         return u"%s" % self.name
@@ -58,11 +58,11 @@ class StoreInstance(models.Model):
     updated_timestamp = models.DateTimeField(auto_now=True)
 
     @staticmethod
-    def create_supermarket_location(address, geolocation, supermarket):
+    def create_store_instance(address, geolocation, store):
         """
         Creates and saves a specific instance of a store with the specified address and geolocation.
         """
-        location = StoreInstance(address=address, geolocation=geolocation, supermarket=supermarket)
+        location = StoreInstance(address=address, geolocation=geolocation, store=store)
         location.save()
         return location
 

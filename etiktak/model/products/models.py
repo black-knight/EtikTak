@@ -111,7 +111,7 @@ class ProductScan(models.Model):
         return scan
 
     def __unicode__(self):
-        return u"%s | %s" % (self.supermarket_location, self.scanned_location)
+        return u"%s | %s" % (self.scanned_location)
 
     class Meta:
         verbose_name = u"Produktscanning"

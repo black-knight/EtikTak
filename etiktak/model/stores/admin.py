@@ -23,16 +23,16 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from etiktak.model.stores import models as supermarkets
+from etiktak.model.stores import models as stores
 
 from django.contrib import admin
 from django_google_maps import widgets as map_widgets
 from django_google_maps import fields as map_fields
 
-class SupermarketLocationAdmin(admin.ModelAdmin):
+class StoreLocationAdmin(admin.ModelAdmin):
     formfield_overrides = {
             map_fields.AddressField: {'widget': map_widgets.GoogleMapsAddressWidget},
     }
 
-admin.site.register(supermarkets.Store)
-admin.site.register(supermarkets.StoreInstance, SupermarketLocationAdmin)
+admin.site.register(stores.Store)
+admin.site.register(stores.StoreInstance, StoreLocationAdmin)
